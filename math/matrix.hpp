@@ -91,6 +91,22 @@ class Matrix
             return sum;
         }
 
+        Matrix operator!() const
+        {
+            Matrix transpose(this->c, this->r);
+
+
+            for(int row = 0; row < this->c; row++)
+            {
+                for(int col = 0; col < this->r; col++)
+                {
+                    transpose[row][col] = (*this)[col][row];
+                }
+            }
+
+            return transpose;
+        }
+
         Matrix operator-(const Matrix &m) const
         {
             if(!(this -> c == m.c && this -> r == m.r))
@@ -137,6 +153,24 @@ class Matrix
 
             return mult;
 
+        }
+
+        Matrix operator>(const Matrix &m)
+        {  
+            if(!(this->r == m.r && this->c == m.c)) 
+            {throw std::invalid_argument("DIMENSIONS OF THE MATRICES MUST MATCH!");}
+
+            Matrix hadamard_matrix(this -> r, this -> c);
+
+            for(int row = 0; row < this -> r; row ++)
+            {
+                for(int col = 0; col < this -> c; col ++)
+                {
+                    hadamard_matrix[row][col] = (*this)[row][col]*m[row][col];
+                }
+            }
+
+            return hadamard_matrix;
         }
         void display_matrix()
         {

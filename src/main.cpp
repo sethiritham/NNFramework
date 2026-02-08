@@ -20,11 +20,8 @@ int main()
     }
 
     m.display_matrix();
-    m1.display_matrix();
-
-    Matrix m2 = m + m1;
-
-    Matrix m3 = m*m1;
     
-    m3.display_matrix();
+    Matrix m2 = !m; 
+
+    m2.display_matrix();
 }
