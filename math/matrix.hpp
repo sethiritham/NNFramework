@@ -90,8 +90,57 @@ class Matrix
 
             return sum;
         }
+
+        Matrix operator-(const Matrix &m) const
+        {
+            if(!(this -> c == m.c && this -> r == m.r))
+            {
+                std::cerr<<"MATRIX DIMENSIONS DONT MATCH! "<<std::endl;
+                throw std::invalid_argument("Matrix dimensions don't match");
+            }
+            Matrix diff(this -> r, this -> c);
+            
+            for(int row = 0; row < r; row ++)
+            {
+                for(int col = 0; col < c; col ++)
+                {
+                    diff.data[row*c + col] = this->data[row*c + col] - m.data[row*c + col];
+                }
+            }
+
+            return diff;
+
+        }
+
+        Matrix operator*(const Matrix &m) const
+        {
+            if (!(this -> c == m.r))
+            {
+                throw std::invalid_argument("Dimensions dont match to multiply");
+            }
+
+            Matrix mult(this->r, m.c);
+
+            for(int i = 0; i < this->r; i++)
+            {
+                for(int j = 0; j < m.c; j++)
+                {
+                    double sum = 0.0;
+                    for(int k = 0; k < this->c; k++)
+                    {
+                        sum += (*this)[i][k]*m[k][j];
+                    }
+
+                    mult[i][j] = sum;
+                }
+            }
+
+            return mult;
+
+        }
         void display_matrix()
         {
+            std::cout<<std::endl;
             for(int row = 0; row < r; row ++)
             {
                 for(int col = 0; col < c; col ++)
@@ -100,7 +149,9 @@ class Matrix
                 }
                 std::cout<<std::endl;
             }
-        }
+
+            std::cout<<std::endl;
+        }   
 
         ~Matrix()
         {

@@ -1,8 +1,12 @@
 #include "../math/matrix.hpp"
+#include <random>
 
 int main()
 {
+    std::random_device rd;
+    std::mt19937 gen(rd());
 
+    std::uniform_int_distribution<> dist(2,5);
     Matrix m(3, 3);
     Matrix m1(3, 3);
 
@@ -10,8 +14,8 @@ int main()
     {
         for(int r = 0; r < 3; r++)
         {
-            m[r][c] = 1;
-            m1[r][c] = 2;
+            m[r][c] = dist(gen);
+            m1[r][c] = dist(gen);
         }
     }
 
@@ -20,5 +24,7 @@ int main()
 
     Matrix m2 = m + m1;
 
-    m2.display_matrix();
+    Matrix m3 = m*m1;
+    
+    m3.display_matrix();
 }
