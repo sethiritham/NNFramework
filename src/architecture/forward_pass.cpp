@@ -2,22 +2,31 @@
 #include <vector>
 #include <cmath>
 #include "../math/matrix.hpp"
+#include <memory>
 
-class ForwardPass
+class NeuralNetwork
 {
     private:
-        int input_size;
-        int output_size;
-        int batch_size;
+        int m_input_size;
+        int m_output_size;
+        int m_hidden_layers;
+        std::vector<int> m_hidden_size;
 
     public:
-        ForwardPass(int input, int output, int batch)
+        NeuralNetwork(int input, int output, int hiddenL) : m_input_size(input), m_output_size(output), m_hidden_layers(hiddenL) 
         {
-            Matrix y(batch, output);
+            int x  = (int)((input - output)/(hiddenL + 1));
 
-            y = 
+            int prev = input;
+            for (int i = 0; i < hiddenL;  i++)
+            {
+                m_hidden_size[i] = prev - x;
+                prev = m_hidden_size[i];
+            }
         }
 };
+
+
 
 
 

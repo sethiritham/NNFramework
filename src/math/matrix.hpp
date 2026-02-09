@@ -209,6 +209,26 @@ class Matrix
             std::cout<<std::endl;
         }   
 
+        static Matrix Identity(int dim)
+        {
+            Matrix iden_matrix(dim, dim);
+
+            for(int i = 0; i < dim; i++)
+            {
+                for(int j = 0; j < dim; j++)
+                {
+                    if(i == j)
+                    {
+                        iden_matrix[i][j] = 1.0;
+                    }
+                    else
+                    {
+                        iden_matrix[i][j] = 0.0;
+                    }
+                }
+            }
+        }
+
         template<typename T, typename Func>
         auto map_matrix(const Matrix& m, Func f)
         {
