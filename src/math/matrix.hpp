@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <stdio.h>
+#include <random>
 #include <iostream>
 #include <vector>
 #include <stdexcept> 
@@ -20,9 +21,13 @@ class Matrix
 
             data = new double[r*c];
 
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_real_distribution<double> dist(4.0, 8.0);
+
             for(int i = 0; i < (r * c); i++)
             {
-                data[i] = 0.0;
+                data[i] = dist(gen);
             }
         }
 
@@ -107,6 +112,23 @@ class Matrix
             return transpose;
         }
 
+        bool operator==(const Matrix &m) const
+        {
+            if(!(this->r == m.r && this->c == m.c)) return false;
+            for(int row = 0; row < this->r; row ++)
+            {
+                for(int col = 0; col < this->c; col ++)
+                {
+                    if(!((*this)[row][col] == m[row][col]))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
         Matrix operator-(const Matrix &m) const
         {
             if(!(this -> c == m.c && this -> r == m.r))
@@ -187,9 +209,24 @@ class Matrix
             std::cout<<std::endl;
         }   
 
+        template<typename T, typename Func>
+        auto map_matrix(const Matrix& m, Func f)
+        {
+            Matrix result_matrix(m.r, m.c);
+
+            for(int row = 0; row < m.r; row++)
+            {
+                for(int col = 0; col < m.c; col++)
+                {
+                    result_matrix[row][col] = Func(m[row][col])
+                }
+            }
+
+            return result_matrix;
+        }
+
         ~Matrix()
         {
             delete[] data;
         }
 };
-

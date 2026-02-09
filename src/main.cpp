@@ -20,8 +20,15 @@ int main()
     }
 
     m.display_matrix();
+    m1.display_matrix();
     
-    Matrix m2 = !m; 
+    Matrix m2 = !(m*m1); 
+
+    if(m2 == !m1*!m)
+    {
+        std::cout<<"MATHIMATICALLY TRANSPOSE CORRECT!"<<std::endl;
+    }
+
 
     m2.display_matrix();
 }
