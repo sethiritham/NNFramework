@@ -9,9 +9,11 @@
 class Matrix
 {
     // Init variables
-    private:
+    public:
         int r;
         int c;
+    
+    private:
         double *data;
 
     // Class fucntions
@@ -33,7 +35,6 @@ class Matrix
             }
         }
 
-
         // Copy constructor
         Matrix(const Matrix &m)
         {
@@ -48,7 +49,20 @@ class Matrix
             }
         }
 
+        void initialize_weights(Matrix &m, int input, int output)
+        {
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_real_distribution<double> dist(input, output);
 
+            for(int row = 0; row < m.r; row++)
+            {
+                for(int col = 0; col < m.c; col++)
+                {
+                    m[row][col] = dist(gen) * std::sqrt(2.0 / input);
+                }
+            }
+        }
         
         Matrix hadamaard_product(const Matrix &m)
         {  
@@ -103,19 +117,15 @@ class Matrix
         }
 
         template<typename T, typename Func>
-        auto map_matrix(const Matrix& m, Func f)
+        auto map_matrix(const Matrix& m, Func& f)
         {
-            Matrix result_matrix(m.r, m.c);
-
             for(int row = 0; row < m.r; row++)
             {
                 for(int col = 0; col < m.c; col++)
                 {
-                    result_matrix[row][col] = Func(m[row][col])
+                    Func(m[row][col]);
                 }
             }
-
-            return result_matrix;
         }
 
         double col_sum(Matrix &m, int col_index)

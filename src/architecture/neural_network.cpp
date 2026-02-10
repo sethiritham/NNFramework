@@ -2,6 +2,7 @@
 #include <vector>
 #include <cmath>
 #include "../math/matrix.hpp"
+#include "../math/activation_functions.hpp"
 #include <memory>
 
 class NeuralNetwork
@@ -33,12 +34,14 @@ class NeuralNetwork
         
         double forward_pass(Matrix &x, Matrix &w, Matrix &b)
         {
+            static std::vector<Matrix> weights(1 + m_hidden_layers);
             Matrix output(m_output_size, 1);
             Matrix prev_pred = x;
 
             for(int i = 0; i < m_hidden_layers; i++)
             {
                 prev_pred = w*prev_pred + b;
+                ReLU(prev_pred);
             }
         }
 };
