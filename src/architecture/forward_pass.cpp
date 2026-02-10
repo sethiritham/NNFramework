@@ -24,7 +24,25 @@ class NeuralNetwork
                 prev = m_hidden_size[i];
             }
         }
+
+        NeuralNetwork(int input, int output, std::vector<int> hidden_sz) : m_input_size(input), m_output_size(output), m_hidden_size(hidden_sz) 
+        {
+            m_hidden_layers = m_hidden_size.size();
+        }
+
+        
+        double forward_pass(Matrix &x, Matrix &w, Matrix &b)
+        {
+            Matrix output(m_output_size, 1);
+            Matrix prev_pred = x;
+
+            for(int i = 0; i < m_hidden_layers; i++)
+            {
+                prev_pred = w*prev_pred + b;
+            }
+        }
 };
+
 
 
 
