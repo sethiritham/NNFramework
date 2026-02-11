@@ -3,6 +3,7 @@
 #include <cmath>
 #include "math/activation_functions.hpp"
 #include <memory>
+#define LOG(x) std::cout << x << std::endl
 
 class NeuralNetwork
 {
@@ -11,28 +12,30 @@ class NeuralNetwork
         int output_size_;
         int hidden_layers_;
         int batch_size_;
-        std::vector<Matrix> input_cache;
+        std::vector<Matrix> input_cache_;
         std::vector<int> hidden_size_;
         Matrix biases;
-        std::vector<Matrix> weights;
+        std::vector<Matrix> weights_;
 
     private:
-        void initialize_weights(std::vector<Matrix>& m, int input, int output)
+        std::vector<Matrix> generate_init_weights(std::vector<Matrix>& weights)
         {
             std::random_device rd;
             std::mt19937 gen(rd());
-            std::uniform_real_distribution<double> dist(input, output);
+            std::uniform_real_distribution<double> dist(input_size_, output_size_);
 
-            for(int i = 0; i < m.size(); i++)
+            for(int i = 0; i < weights.size(); i++)
             {
-                for(int row = 0; row < m[i].num_rows; row++)
+                for(int row = 0; row < weights[i].num_rows; row++)
                 {
-                    for(int col = 0; col < m[i].num_cols; col++)
+                    for(int col = 0; col < weights[i].num_cols; col++)
                     {
-                        m[i][row][col] = dist(gen) * std::sqrt(2.0 / input);
+                        weights[i][row][col] = dist(gen) * std::sqrt(2.0 / input_size_);
                     }
                 }
             }
+
+            return weights;
         }
 
         Matrix calculate_gradient(Matrix pred, Matrix actual)
@@ -64,33 +67,34 @@ class NeuralNetwork
             std::cout<<"Started initializer"<<std::endl;
             Matrix biases = Matrix::fill_matrix(0.0, batch_size_, output_size_);
 
-            std::cout<<"Made bias"<<std::endl;
-
-            initialize_weights(weights, input_size_, output_size_);
-
-            std::cout<<"weights initialized"<<std::endl;
+            weights_.reserve(hidden_layers_ + 1); 
+            input_cache_.reserve(hidden_layers_ + 1);
 
             int x  = (int)((input - output)/(hiddenL + 1));
 
             int prev = input;
 
-            std::cout<<"Before initializing hidden_size_"<<std::endl;
             for (int i = 0; i < hiddenL;  i++)
             {
-                std::cout<<"error"<<std::endl;
-                std::cout<<prev-x<<std::endl;
                 hidden_size_[i] = prev - x;
-                std::cerr<<"PROBLEM"<<std::endl;
                 prev = hidden_size_[i];
             }
-            std::cout<<"after initializing hidden_size_"<<std::endl;
+
+            weights_.emplace_back(input, output);
+            input_cache_.emplace_back(batch_size_, input);
+            weights_ = generate_init_weights(weights_);
         }
 
         NeuralNetwork(int input, int output, std::vector<int> hidden_sz) 
         : input_size_(input), output_size_(output), hidden_size_(hidden_sz), biases(batch_size_, output_size_)
         {
+            weights_.reserve(hidden_layers_ + 1); 
+            input_cache_.reserve(hidden_layers_ + 1);
+
+            weights_.emplace_back(input, output);  
+            input_cache_.emplace_back(batch_size_, input);
             Matrix biases = Matrix::fill_matrix(0.0, batch_size_, output_size_);
-            initialize_weights(weights, input_size_, output_size_);
+            weights_ = generate_init_weights(weights_);
 
             hidden_layers_ = hidden_size_.size();
         }
@@ -99,17 +103,24 @@ class NeuralNetwork
         
         Matrix forward_pass(Matrix &inputs)
         {
-            input_cache = std::vector<Matrix> (); //cleaing the input cache at the start of the forward pass 
+            LOG("STARTED FORWARD PASS");
+            input_cache_.clear(); //cleaing the input cache at the start of the forward pass 
 
             Matrix prev_pred = inputs;
 
             for(int i = 0; i < hidden_layers_ + 1; i++)
             {
-                prev_pred = weights[i]*prev_pred + biases;
-                update_using_ReLU(prev_pred);
-                input_cache[i] = prev_pred;
-            };
+                LOG("TRYING WEIGHTS");
+                weights_[i].display_matrix();
 
+                (prev_pred*weights_[i]).display_matrix();
+                prev_pred = prev_pred*weights_[i] + biases;
+                update_using_ReLU(prev_pred);
+                input_cache_.emplace_back(prev_pred);
+                std::cout<<"LOOP "<<i<<" COMPLETED"<<std::endl;
+            }
+
+            prev_pred.display_matrix();
             return prev_pred;
         }
 

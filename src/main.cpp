@@ -1,6 +1,6 @@
 #include "architecture/neural_network.hpp"
 #include <random>
-
+#define LOG(x) std::cout << x << std::endl
 
 int main()
 {
@@ -18,10 +18,15 @@ int main()
 
     for(int i = 0; i < 7; i++)
     {
-        input[i][1] = dist(gen);
+        input[i][0] = dist(gen);
     }
 
+    LOG("INPUT MATRIX\n");
+    input.display_matrix();
+
     Matrix pred = nn.forward_pass(input);
+
+    LOG("IF THIS IS VISIBLE FORWARD PASS IS NOT THE PROB!");
 
     pred.display_matrix();
 
