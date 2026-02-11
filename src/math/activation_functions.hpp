@@ -1,6 +1,7 @@
 #include <cmath>
 #include <iostream>
 
-void ReLU(Matrix &m);
+
+void update_using_ReLU(Matrix &m);
 
 void sigmoid(double &val);

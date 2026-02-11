@@ -1,11 +1,11 @@
 #include "activation_functions.hpp"
 #include "matrix.hpp"
 
-void ReLU(Matrix &m)
+void update_using_ReLU(Matrix &m)
 {
-    for(int row = 0; row < m.r; row++)
+    for(int row = 0; row < m.num_rows; row++)
     {
-        for(int col = 0; col < m.c; col++)
+        for(int col = 0; col < m.num_cols; col++)
         {
             m[row][col] = (m[row][col] < 0) ? 0 : m[row][col];
         }
