@@ -3,7 +3,7 @@
 
 //PUBLIC FUNCTIONS
 NeuralNetwork::NeuralNetwork(int input, int output, int hiddenL, int batchS) 
-:   in_features_(input), out_features_(output), batch_size_(batchS), num_hidden_layers_(hiddenL), 
+:   in_features_(input), out_features_(output), num_hidden_layers_(hiddenL), batch_size_(batchS),
     hidden_layer_sizes_(num_hidden_layers_)
     {
         std::cout<<"Started initializer"<<std::endl;
@@ -29,7 +29,7 @@ NeuralNetwork::NeuralNetwork(int input, int output, int hiddenL, int batchS)
             biases_.emplace_back(batch_size_, out_features_);
         }
 
-        for(int i = 0; i < biases_.size(); i++)
+        for(std::size_t i = 0; i < biases_.size(); i++)
         {
             Matrix::fill_matrix_double(0.0, biases_[i]);
         }
@@ -38,7 +38,7 @@ NeuralNetwork::NeuralNetwork(int input, int output, int hiddenL, int batchS)
     }
 
 NeuralNetwork::NeuralNetwork(int input, int output, std::vector<int> hidden_sz, int batchS) 
-:   in_features_(input), out_features_(output), batch_size_(batchS), num_hidden_layers_(hidden_sz.size()), 
+:   in_features_(input), out_features_(output), num_hidden_layers_(hidden_sz.size()), batch_size_(batchS), 
     hidden_layer_sizes_(hidden_sz.size())
     {
         std::cout<<"Started initializer"<<std::endl;
@@ -109,7 +109,7 @@ void NeuralNetwork::update_init_weights_ReLU(std::vector<Matrix>& weights)
     std::mt19937 gen(rd());
     std::uniform_real_distribution<double> dist(in_features_, out_features_);
 
-    for(int i = 0; i < weights.size(); i++)
+    for(std::size_t i = 0; i < weights.size(); i++)
     {
         for(int row = 0; row < weights[i].num_rows; row++)
         {
@@ -134,7 +134,7 @@ void NeuralNetwork::update_gradient_using_filter(Matrix& gradient, Matrix &outpu
         {
             if(output[row][col] == 0.0)
             {
-                gradient[row][col] == 0.0;
+                gradient[row][col] = 0.0;
             }
         }
     }

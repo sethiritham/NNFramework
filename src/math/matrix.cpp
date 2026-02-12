@@ -228,3 +228,8 @@ Matrix Matrix::operator*(const Matrix &m) const
     return mult;
 
 }
+
+std::size_t Matrix::num_elements()
+{
+    return this->num_rows * this->num_cols;
+}

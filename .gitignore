@@ -1,0 +1,4 @@
+build/
+.clocignore 
+neural_network_roadmap.md
+.vscode/

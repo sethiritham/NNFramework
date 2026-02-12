@@ -30,13 +30,23 @@ class Matrix
         
         void display_matrix();
 
+        double col_sum(Matrix &m, int col_index);
+
+        std::size_t num_elements();
+
+        Matrix collapse_horizontal(Matrix& m);
+
+        ~Matrix();
+
+    public:
+        //Static functions
         static void fill_matrix_array(std::vector<double> values, Matrix &matrix)
         {
-            if(!(values.size() == matrix.num_cols * matrix.num_rows))
+            if(!(values.size() == matrix.num_elements()))
             {
                 throw std::invalid_argument("ERROR THE SIZE OF THE INPUT DOESNT MATCH THE DIMENSION OF THE MATRIX ");
             }
-            
+
             for(int row = 0; row < matrix.num_rows; row++)
             {
                 for(int col = 0 ;col < matrix.num_cols; col++)
@@ -78,22 +88,21 @@ class Matrix
         }
 
         template<typename T, typename Func>
-        auto map_matrix(const Matrix& m, Func& f)
+        auto map_matrix(const Matrix<T>& m, Func f)
         {
+            using ResultType = decltype(f(m.data[0]));
+
+            Matrix<ResultType> result[m.num_rows];
+
             for(int row = 0; row < m.num_rows; row++)
             {
                 for(int col = 0; col < m.num_cols; col++)
                 {
-                    Func(m[row][col]);
+                    result(row, col) = f(m(row, col));
                 }
             }
         }
 
-        double col_sum(Matrix &m, int col_index);
-
-        Matrix collapse_horizontal(Matrix& m);
-
-        ~Matrix();
 
     // Matrix operators
     public:

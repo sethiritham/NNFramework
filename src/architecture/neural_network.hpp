@@ -3,7 +3,6 @@
 #include <cmath>
 #include "math/activation_functions.hpp"
 #include <memory>
-#define LOG(x) std::cout << x << std::endl
 
 class NeuralNetwork
 {
@@ -32,9 +31,6 @@ class NeuralNetwork
 
         Matrix loss_fn(Matrix& pred, Matrix& actual);
 
-        void backward_pass(std::vector<Matrix>& inputs, std::vector<Matrix>& weights, Matrix& filtered_gradient, int batch_size)
-        {
-            
-        }
+        void backward_pass(std::vector<Matrix>& inputs, std::vector<Matrix>& weights, Matrix& filtered_gradient, int batch_size);
 };
 
