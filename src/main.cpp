@@ -1,6 +1,5 @@
 #include "architecture/neural_network.hpp"
 #include <random>
-#define LOG(x) std::cout << x << std::endl
 
 int main()
 {

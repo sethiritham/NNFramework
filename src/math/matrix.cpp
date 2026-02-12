@@ -66,7 +66,7 @@ void Matrix::display_matrix()
 
 double Matrix::col_sum(Matrix &m, int col_index)
 {
-    double sum;
+    double sum = 0.0;
     
     for(int row = 0; row < m.num_rows; row++)
     {

@@ -85,22 +85,24 @@ class Matrix
                     }
                 }
             }
+
+            return iden_matrix;
         }
 
         template<typename T, typename Func>
-        auto map_matrix(const Matrix<T>& m, Func f)
+        Matrix map_matrix(const Matrix& m, Func& f)
         {
-            using ResultType = decltype(f(m.data[0]));
-
-            Matrix<ResultType> result[m.num_rows];
+            Matrix result(m.num_rows, m.num_cols);
 
             for(int row = 0; row < m.num_rows; row++)
             {
                 for(int col = 0; col < m.num_cols; col++)
                 {
-                    result(row, col) = f(m(row, col));
+                    result[row][col] = f(m[row][col]);
                 }
             }
+
+            return result;
         }
 
 
