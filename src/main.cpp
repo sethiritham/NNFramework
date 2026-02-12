@@ -6,6 +6,18 @@ int main()
 {
     std::cout<<"STARTED"<<std::endl;
 
+    Matrix accurate_pred(7, 1);
+
+    std::vector<double> accurate_pred_array;
+
+    LOG(accurate_pred_array.size());
+    for(int i = 0; i < 7; i++)
+    {
+        accurate_pred_array.push_back(10.0);
+    }
+
+    LOG(accurate_pred_array.size());
+
     NeuralNetwork nn(1, 1, 3, 7);
 
     std::cout<<"CREATED NEURAL NETWORK"<<std::endl;
@@ -26,10 +38,13 @@ int main()
 
     Matrix pred = nn.forward_pass(input);
 
-    LOG("IF THIS IS VISIBLE FORWARD PASS IS NOT THE PROB!");
-
     pred.display_matrix();
 
-    std::cout<<"PRINTED MATRIX! "<<input[0][0]<<std::endl;
+    
+    Matrix::fill_matrix_array(accurate_pred_array, accurate_pred);
+
+    Matrix loss_matrix = nn.loss_fn(pred, accurate_pred);
+
+    loss_matrix.display_matrix();
 
 }

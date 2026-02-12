@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <stdexcept> 
+#define LOG(x) std::cout<<x<<std::endl
 #include <string>
 
 class Matrix
@@ -29,19 +30,31 @@ class Matrix
         
         void display_matrix();
 
-        static Matrix fill_matrix(double fill, int row, int col)
+        static void fill_matrix_array(std::vector<double> values, Matrix &matrix)
         {
-            Matrix fill_matrix(row, col);
-
-            for(int i = 0; i < row; i++)
+            if(!(values.size() == matrix.num_cols * matrix.num_rows))
             {
-                for(int j = 0; j < col; j++)
+                throw std::invalid_argument("ERROR THE SIZE OF THE INPUT DOESNT MATCH THE DIMENSION OF THE MATRIX ");
+            }
+            
+            for(int row = 0; row < matrix.num_rows; row++)
+            {
+                for(int col = 0 ;col < matrix.num_cols; col++)
                 {
-                    fill_matrix[i][j] = fill;
+                    matrix[row][col] = values[row + col];
                 }
             }
+        }
 
-            return fill_matrix;
+        static void fill_matrix_double(double fill, Matrix &m)
+        {
+            for(int i = 0; i < m.num_rows; i++)
+            {
+                for(int j = 0; j < m.num_cols; j++)
+                {
+                    m[i][j] = fill;
+                }
+            }
         }
 
         static Matrix identity(int dim)
