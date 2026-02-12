@@ -90,7 +90,7 @@ class Matrix
         }
 
         template<typename T, typename Func>
-        Matrix map_matrix(const Matrix& m, Func& f)
+        static Matrix map_matrix(const Matrix& m, Func& f)
         {
             Matrix result(m.num_rows, m.num_cols);
 

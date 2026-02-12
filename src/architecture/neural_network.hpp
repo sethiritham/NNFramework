@@ -11,7 +11,7 @@ class NeuralNetwork
         int out_features_;
         int num_hidden_layers_;
         int batch_size_;
-        std::vector<int> hidden_layer_sizes_;
+        std::vector<int> layer_sizes_;
 
         std::vector<Matrix> input_cache_;
         std::vector<Matrix> biases_;
@@ -19,8 +19,7 @@ class NeuralNetwork
 
     private:
         void update_init_weights_ReLU(std::vector<Matrix>& weights);
-        Matrix calculate_gradient(Matrix pred, Matrix actual);
-        void update_gradient_using_filter(Matrix& gradient, Matrix &output);
+        Matrix calculate_and_filter_gradient(Matrix pred, Matrix actual);
     
     public:
         NeuralNetwork(int input, int output, int hiddenL, int batchS);
@@ -31,6 +30,6 @@ class NeuralNetwork
 
         Matrix loss_fn(Matrix& pred, Matrix& actual);
 
-        void backward_pass(std::vector<Matrix>& inputs, std::vector<Matrix>& weights, Matrix& filtered_gradient, int batch_size);
+        void backward_pass(Matrix& filtered_gradient);
 };
 

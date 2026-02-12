@@ -5,7 +5,7 @@ int main()
 {
     std::cout<<"STARTED"<<std::endl;
 
-    Matrix accurate_pred(7, 1);
+    Matrix accurate_pred(3, 1);
 
     std::vector<double> accurate_pred_array;
 
