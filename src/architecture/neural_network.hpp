@@ -18,7 +18,7 @@ class NeuralNetwork
         std::vector<Matrix> weights_;
 
     private:
-        std::vector<Matrix> generate_init_weights(std::vector<Matrix>& weights)
+        void generate_init_weights(std::vector<Matrix>& weights)
         {
             std::random_device rd;
             std::mt19937 gen(rd());
@@ -34,8 +34,6 @@ class NeuralNetwork
                     }
                 }
             }
-
-            return weights;
         }
 
         Matrix calculate_gradient(Matrix pred, Matrix actual)
@@ -80,9 +78,12 @@ class NeuralNetwork
                 prev = hidden_size_[i];
             }
 
-            weights_.emplace_back(input, output);
-            input_cache_.emplace_back(batch_size_, input);
-            weights_ = generate_init_weights(weights_);
+            for(int i = 0; i < hidden_layers_ + 1; i++)
+            {
+                weights_.emplace_back(input, output);
+                input_cache_.emplace_back(batch_size_, input);
+            }
+            generate_init_weights(weights_);
         }
 
         NeuralNetwork(int input, int output, std::vector<int> hidden_sz) 
@@ -91,10 +92,14 @@ class NeuralNetwork
             weights_.reserve(hidden_layers_ + 1); 
             input_cache_.reserve(hidden_layers_ + 1);
 
-            weights_.emplace_back(input, output);  
-            input_cache_.emplace_back(batch_size_, input);
+            for(int i = 0; i < hidden_layers_ + 1; i++)
+            {
+                weights_.emplace_back(input, output);
+                input_cache_.emplace_back(batch_size_, input);
+            }
+            
             Matrix biases = Matrix::fill_matrix(0.0, batch_size_, output_size_);
-            weights_ = generate_init_weights(weights_);
+            generate_init_weights(weights_);
 
             hidden_layers_ = hidden_size_.size();
         }
