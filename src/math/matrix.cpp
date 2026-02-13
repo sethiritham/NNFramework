@@ -51,17 +51,21 @@ Matrix Matrix::hadamaard_product(const Matrix &m)
 
 void Matrix::display_matrix()
 {
-    std::cout<<std::endl;
+    std::cout<<'\n';
     for(int row = 0; row < num_rows; row ++)
     {
         for(int col = 0; col < num_cols; col ++)
         {
-            std::cout<<data[row * num_cols + col]<<" ";
+            std::cout << std::setw(12) << std::fixed << std::setprecision(2) 
+                      << (*this)[row][col] << "  "; 
         }
-        std::cout<<std::endl;
+        std::cout<<'\n';
     }
+    std::cout<<'\n';
 
-    std::cout<<std::endl;
+    LOG("MATRIX DIMENSIONS\n");
+
+    std::cout<<"ROWS: "<<num_rows<<" COLS: "<<num_cols<<'\n';
 }   
 
 double Matrix::col_sum(Matrix &m, int col_index)

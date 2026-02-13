@@ -6,7 +6,7 @@
 
 class NeuralNetwork
 {
-    private:
+    public:
         std::size_t in_features_;
         std::size_t out_features_;
         std::size_t num_hidden_layers_;
@@ -16,6 +16,9 @@ class NeuralNetwork
         std::vector<Matrix> input_cache_;
         std::vector<Matrix> biases_;
         std::vector<Matrix> weights_;
+
+        const double learning_rate;
+        Matrix actual_prediction;
 
     private:
         /**
@@ -30,7 +33,7 @@ class NeuralNetwork
          * @param pred The prediction matrix
          * @param actual The true prediction 
          */
-        Matrix calculate_and_filter_gradient(Matrix& loss);
+        Matrix calculate_and_filter_gradient(Matrix& pred, Matrix& loss);
 
         double convert_loss_to_gradient(double element) 
         { 
@@ -46,7 +49,7 @@ class NeuralNetwork
          * @param hiddenL num_hidden_layers
          * @param batchS batch_size
          */
-        NeuralNetwork(int input, int output, int hiddenL, int batchS);
+        NeuralNetwork(int input, int output, int hiddenL, int batchS, double lr);
 
         /**
          * @brief Initiates the Neural Network
@@ -56,7 +59,7 @@ class NeuralNetwork
          * @param hidden_sz size of each hidden layer
          * @param batchS batch_size
          */
-        NeuralNetwork(int input, int output, std::vector<int> hidden_sz, int batchS);
+        NeuralNetwork(int input, int output, std::vector<int> hidden_sz, int batchS, double lr);
         
         /**
          * @brief executes the forward pass and returns the prediction
@@ -71,6 +74,6 @@ class NeuralNetwork
         /**
          * @brief exectues backward pass, weights and biases updated
          */
-        void backward_pass(Matrix& loss, const double& learning_rate);
+        void backward_pass();
 };
 

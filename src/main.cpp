@@ -5,19 +5,12 @@ int main()
 {
     std::cout<<"STARTED"<<std::endl;
 
-    Matrix accurate_pred(3, 1);
+    Matrix accurate_pred(7, 1);
 
-    std::vector<double> accurate_pred_array;
+    accurate_pred.fill_matrix_double(0.0, accurate_pred);
+    accurate_pred[1][0] = 10.0;
 
-    LOG(accurate_pred_array.size());
-    for(int i = 0; i < 7; i++)
-    {
-        accurate_pred_array.push_back(10.0);
-    }
-
-    LOG(accurate_pred_array.size());
-
-    NeuralNetwork nn(1, 1, 3, 7);
+    NeuralNetwork nn(7, 1, 3, 7, 0.01);
 
     std::cout<<"CREATED NEURAL NETWORK"<<std::endl;
 
@@ -25,11 +18,14 @@ int main()
     std::mt19937 gen(rd());
     std::uniform_real_distribution<double> dist(-7, 7);
 
-    Matrix input(7, 1);
+    Matrix input(7, 7);
 
     for(int i = 0; i < 7; i++)
     {
-        input[i][0] = dist(gen);
+        for(int j = 0; j < 7; j++)
+        {
+            input[i][j] = dist(gen);
+        }
     }
 
     LOG("INPUT MATRIX\n");
@@ -37,13 +33,24 @@ int main()
 
     Matrix pred = nn.forward_pass(input);
 
+    LOG("PREDICTION MATRIX\n");
     pred.display_matrix();
 
-    
-    Matrix::fill_matrix_array(accurate_pred_array, accurate_pred);
+    LOG("ACTUAL MATRIX\n");
+    accurate_pred.display_matrix();
 
     Matrix loss_matrix = nn.loss_fn(pred, accurate_pred);
 
+    LOG("LOSS MATRIX");
     loss_matrix.display_matrix();
+
+
+    LOG("ONE OF THE WEIGHTS BEFORE BACK PROP");
+    nn.weights_[2].display_matrix();
+
+    nn.backward_pass();
+
+    LOG("BACKWARD PASS COMPLETE ONE OF THE WEIGHT AFTER");
+    nn.weights_[2].display_matrix();
 
 }
