@@ -49,7 +49,7 @@ class NeuralNetwork
          * @param hiddenL num_hidden_layers
          * @param batchS batch_size
          */
-        NeuralNetwork(int input, int output, int hiddenL, int batchS, double lr);
+        NeuralNetwork(std::size_t input, std::size_t output, std::size_t hiddenL, std::size_t batchS, double lr);
 
         /**
          * @brief Initiates the Neural Network
@@ -59,7 +59,7 @@ class NeuralNetwork
          * @param hidden_sz size of each hidden layer
          * @param batchS batch_size
          */
-        NeuralNetwork(int input, int output, std::vector<int> hidden_sz, int batchS, double lr);
+        NeuralNetwork(std::size_t input, std::size_t output, std::vector<int> hidden_sz, std::size_t batchS, double lr);
         
         /**
          * @brief executes the forward pass and returns the prediction

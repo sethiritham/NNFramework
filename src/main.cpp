@@ -53,4 +53,24 @@ int main()
     LOG("BACKWARD PASS COMPLETE ONE OF THE WEIGHT AFTER");
     nn.weights_[2].display_matrix();
 
+    LOG("SECOND FORWARD PASS NOW");
+
+    pred = nn.forward_pass(input);
+
+    loss_matrix = nn.loss_fn(pred, accurate_pred);
+
+    LOG("LOSS NOW\n");
+    loss_matrix.display_matrix();
+
+
+    LOG("ONE OF THE WEIGHTS BEFORE BACK PROP");
+    nn.weights_[2].display_matrix();
+
+    nn.backward_pass();
+
+    LOG("BACKWARD PASS COMPLETE ONE OF THE WEIGHT AFTER");
+    nn.weights_[2].display_matrix();
+
+
+    
 }

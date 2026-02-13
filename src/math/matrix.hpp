@@ -79,9 +79,9 @@ class Matrix
                 throw std::invalid_argument("ERROR THE SIZE OF THE INPUT DOESNT MATCH THE DIMENSION OF THE MATRIX ");
             }
 
-            for(int row = 0; row < matrix.num_rows; row++)
+            for(std::uint32_t row = 0; row < matrix.num_rows; row++)
             {
-                for(int col = 0 ;col < matrix.num_cols; col++)
+                for(std::uint32_t col = 0 ;col < matrix.num_cols; col++)
                 {
                     matrix[row][col] = values[row + col];
                 }
@@ -93,9 +93,9 @@ class Matrix
          */
         static void fill_matrix_double(double fill, Matrix &m)
         {
-            for(int i = 0; i < m.num_rows; i++)
+            for(std::uint32_t i = 0; i < m.num_rows; i++)
             {
-                for(int j = 0; j < m.num_cols; j++)
+                for(std::uint32_t j = 0; j < m.num_cols; j++)
                 {
                     m[i][j] = fill;
                 }
@@ -136,9 +136,9 @@ class Matrix
 
             Matrix result(matrix.num_rows, matrix.num_cols);
 
-            for(int row = 0; row < matrix.num_rows; row++)
+            for(std::uint32_t row = 0; row < matrix.num_rows; row++)
             {
-                for(int col = 0; col < matrix.num_cols; col++)
+                for(std::uint32_t col = 0; col < matrix.num_cols; col++)
                 {
                     result[row][col] = matrix[row][col] + row_matrix[0][col];
                 }
@@ -213,9 +213,9 @@ Matrix map_matrix(const Matrix& m, Func f)
 {
     Matrix result(m.num_rows, m.num_cols);
 
-    for(int row = 0; row < m.num_rows; row++)
+    for(std::uint32_t row = 0; row < m.num_rows; row++)
     {
-        for(int col = 0; col < m.num_cols; col++)
+        for(std::uint32_t col = 0; col < m.num_cols; col++)
         {
             result[row][col] = f(m[row][col]);
         }

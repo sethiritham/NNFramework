@@ -12,7 +12,7 @@ Matrix::Matrix(int rows, int cols)
             std::mt19937 gen(rd());
             std::uniform_real_distribution<double> dist(4.0, 8.0);
 
-            for(int i = 0; i < (num_rows * num_cols); i++)
+            for(std::uint32_t i = 0; i < (num_rows * num_cols); i++)
             {
                 data[i] = dist(gen);
             }
@@ -25,7 +25,7 @@ Matrix::Matrix(const Matrix &m)
             this -> num_rows = m.num_rows;
             this -> num_cols = m.num_cols;
 
-            for(int i = 0; i < (num_rows * num_cols); i++)
+            for(std::uint32_t i = 0; i < (num_rows * num_cols); i++)
             {
                 data[i] = m.data[i];
             }
@@ -38,9 +38,9 @@ Matrix Matrix::hadamaard_product(const Matrix &m)
 
             Matrix hadamard_matrix(this -> num_rows, this -> num_cols);
 
-            for(int row = 0; row < this -> num_rows; row ++)
+            for(std::uint32_t row = 0; row < this -> num_rows; row ++)
             {
-                for(int col = 0; col < this -> num_cols; col ++)
+                for(std::uint32_t col = 0; col < this -> num_cols; col ++)
                 {
                     hadamard_matrix[row][col] = (*this)[row][col]*m[row][col];
                 }
@@ -52,9 +52,9 @@ Matrix Matrix::hadamaard_product(const Matrix &m)
 void Matrix::display_matrix()
 {
     std::cout<<'\n';
-    for(int row = 0; row < num_rows; row ++)
+    for(std::uint32_t row = 0; row < num_rows; row ++)
     {
-        for(int col = 0; col < num_cols; col ++)
+        for(std::uint32_t col = 0; col < num_cols; col ++)
         {
             std::cout << std::setw(12) << std::fixed << std::setprecision(2) 
                       << (*this)[row][col] << "  "; 
@@ -72,7 +72,7 @@ double Matrix::col_sum(Matrix &m, int col_index)
 {
     double sum = 0.0;
     
-    for(int row = 0; row < m.num_rows; row++)
+    for(std::uint32_t row = 0; row < m.num_rows; row++)
     {
         sum += m[row][col_index];
     }
@@ -84,7 +84,7 @@ Matrix Matrix::collapse_horizontal(Matrix& m)
 {
     Matrix result(1, m.num_cols);
 
-    for(int col = 0; col < m.num_cols; col++)
+    for(std::uint32_t col = 0; col < m.num_cols; col++)
     {
         result[1][col] = col_sum(m, col);
     }
@@ -123,7 +123,7 @@ Matrix& Matrix::operator=(const Matrix &m)
     this -> num_rows = m.num_rows;
     this -> num_cols = m.num_cols;
 
-    for(int i = 0; i < (num_rows * num_cols); i++)
+    for(std::uint32_t i = 0; i < (num_rows * num_cols); i++)
     {
         data[i] = m.data[i];
     }
@@ -141,9 +141,9 @@ Matrix Matrix::operator+(const Matrix &m) const
     }
     Matrix sum(this -> num_rows, this -> num_cols);
     
-    for(int row = 0; row < num_rows; row ++)
+    for(std::uint32_t row = 0; row < num_rows; row ++)
     {
-        for(int col = 0; col < num_cols; col ++)
+        for(std::uint32_t col = 0; col < num_cols; col ++)
         {
             sum.data[row*num_cols + col] = this->data[row*num_cols + col] + m.data[row*num_cols + col];
         }
@@ -157,9 +157,9 @@ Matrix Matrix::operator~() const
     Matrix transpose(this->num_cols, this->num_rows);
 
 
-    for(int row = 0; row < this->num_cols; row++)
+    for(std::uint32_t row = 0; row < this->num_cols; row++)
     {
-        for(int col = 0; col < this->num_rows; col++)
+        for(std::uint32_t col = 0; col < this->num_rows; col++)
         {
             transpose[row][col] = (*this)[col][row];
         }
@@ -171,9 +171,9 @@ Matrix Matrix::operator~() const
 bool Matrix::operator==(const Matrix &m) const
 {
     if(!(this->num_rows == m.num_rows && this->num_cols == m.num_cols)) return false;
-    for(int row = 0; row < this->num_rows; row ++)
+    for(std::uint32_t row = 0; row < this->num_rows; row ++)
     {
-        for(int col = 0; col < this->num_cols; col ++)
+        for(std::uint32_t col = 0; col < this->num_cols; col ++)
         {
             if(!((*this)[row][col] == m[row][col]))
             {
@@ -193,9 +193,9 @@ Matrix Matrix::operator-(const Matrix &m) const
     }
     Matrix diff(this -> num_rows, this -> num_cols);
     
-    for(int row = 0; row < num_rows; row ++)
+    for(std::uint32_t row = 0; row < num_rows; row ++)
     {
-        for(int col = 0; col < num_cols; col ++)
+        for(std::uint32_t col = 0; col < num_cols; col ++)
         {
             diff.data[row*num_cols + col] = this->data[row*num_cols + col] - m.data[row*num_cols + col];
         }
@@ -214,12 +214,12 @@ Matrix Matrix::operator*(const Matrix &m) const
 
     Matrix mult(this->num_rows, m.num_cols);
 
-    for(int i = 0; i < this->num_rows; i++)
+    for(std::uint32_t i = 0; i < this->num_rows; i++)
     {
-        for(int j = 0; j < m.num_cols; j++)
+        for(std::uint32_t j = 0; j < m.num_cols; j++)
         {
             double sum = 0.0;
-            for(int k = 0; k < this->num_cols; k++)
+            for(std::uint32_t k = 0; k < this->num_cols; k++)
             {
                 sum += (*this)[i][k]*m[k][j];
             }
@@ -237,9 +237,9 @@ Matrix Matrix::operator*(const double scalar) const
 
     Matrix result(this->num_rows, this->num_cols);
 
-    for(int row = 0; row < this->num_rows; row++)
+    for(std::uint32_t row = 0; row < this->num_rows; row++)
     {
-        for(int col = 0; col < this->num_cols; col++)
+        for(std::uint32_t col = 0; col < this->num_cols; col++)
         {
             result[row][col] = (*this)[row][col]*scalar; 
         }

@@ -2,7 +2,7 @@
 
 
 //PUBLIC FUNCTIONS
-NeuralNetwork::NeuralNetwork(int input, int output, int hiddenL, int batchS, double lr) 
+NeuralNetwork::NeuralNetwork(std::size_t input, std::size_t output, std::size_t hiddenL, std::size_t batchS, double lr) 
 :   in_features_(input), out_features_(output), num_hidden_layers_(hiddenL), batch_size_(batchS),
     layer_sizes_(num_hidden_layers_ + 2), learning_rate(lr)
     {
@@ -14,25 +14,19 @@ NeuralNetwork::NeuralNetwork(int input, int output, int hiddenL, int batchS, dou
 
         int x  = (int)((in_features_ - out_features_)/(num_hidden_layers_ + 1));
 
-        for (int i = 0; i < num_hidden_layers_ + 2;  i++)
+        for (std::size_t i = 0; i < num_hidden_layers_ + 2;  i++)
         {
             layer_sizes_[i] = input - x*i;
             input_cache_.emplace_back(batch_size_, layer_sizes_[i]);
-
-            LOG("LAYER SIZE " << i + 1 << " LAYER " << layer_sizes_[i]);
         }
 
         layer_sizes_[num_hidden_layers_ + 1] = out_features_;
 
-        for(int j = 0; j < num_hidden_layers_ + 1; j++)
+        for(std::size_t j = 0; j < num_hidden_layers_ + 1; j++)
         {
             weights_.emplace_back(layer_sizes_[j], layer_sizes_[j + 1]);
             biases_.emplace_back(1, layer_sizes_[j + 1]);
         }
-
-        LOG("WEIGHTS AND BIASES CHECK\nBIASES");
-
-        LOG(biases_[1].num_elements());
 
         for(std::size_t i = 0; i < biases_.size(); i++)
         {
@@ -42,7 +36,7 @@ NeuralNetwork::NeuralNetwork(int input, int output, int hiddenL, int batchS, dou
         update_init_weights_ReLU(weights_);
     }
 
-NeuralNetwork::NeuralNetwork(int input, int output, std::vector<int> hidden_sz, int batchS, double lr) 
+NeuralNetwork::NeuralNetwork(std::size_t input, std::size_t output, std::vector<int> hidden_sz, std::size_t batchS, double lr) 
 :   in_features_(input), out_features_(output), num_hidden_layers_(hidden_sz.size()), batch_size_(batchS), 
     layer_sizes_(hidden_sz.size() + 2), learning_rate(lr)
     {
@@ -56,13 +50,13 @@ NeuralNetwork::NeuralNetwork(int input, int output, std::vector<int> hidden_sz, 
 
         int prev = input;
 
-        for (int i = 0; i < num_hidden_layers_;  i++)
+        for (std::size_t i = 0; i < num_hidden_layers_;  i++)
         {
             layer_sizes_[i] = prev - x;
             prev = layer_sizes_[i];
         }
 
-        for(int i = 0; i < num_hidden_layers_ + 1; i++)
+        for(std::size_t i = 0; i < num_hidden_layers_ + 1; i++)
         {
             weights_.emplace_back(input, output);
             input_cache_.emplace_back(batch_size_, input);
@@ -81,18 +75,12 @@ Matrix NeuralNetwork::forward_pass(Matrix &inputs)
 
         Matrix prev_pred = input_cache_[0];
 
-        for(int i = 0; i < num_hidden_layers_ + 1; i++)
+        for(std::size_t i = 0; i < num_hidden_layers_ + 1; i++)
         {
             prev_pred = Matrix::row_wise_sum(prev_pred*weights_[i], biases_[i]);
             update_using_ReLU(prev_pred);
             input_cache_.emplace_back(prev_pred);
-            std::cout<<"PREV PRED MATRIX AFTER "<<i+1<<"th Forward pass"<<'\n';
-            prev_pred.display_matrix();
         }
-
-        LOG("COMPLETED FORWARD PASS");
-
-        LOG("PREV PRED MATRIX\n");
 
         prev_pred.display_matrix();
 
@@ -101,16 +89,11 @@ Matrix NeuralNetwork::forward_pass(Matrix &inputs)
 
 Matrix NeuralNetwork::loss_fn(Matrix& pred, Matrix& actual)
     {
-        LOG("STARTED LOSS FUNCTION");
         actual_prediction = actual;
 
         Matrix loss_matrix(pred.num_rows, pred.num_cols);
-        
-        LOG("BEFORE SUBTRACTING PRED AND ACTUAL");
 
         loss_matrix = pred - actual;
-
-        LOG("AFTER SUBTRACTING PRED AND ACTUAL");
         
         loss_matrix = map_matrix<double>(loss_matrix, 
             [](double element)
@@ -120,7 +103,6 @@ Matrix NeuralNetwork::loss_fn(Matrix& pred, Matrix& actual)
         
         return loss_matrix;
 
-        LOG("ENDED LOSS FUNCTION");
     }
 
 
@@ -133,9 +115,9 @@ void NeuralNetwork::update_init_weights_ReLU(std::vector<Matrix>& weights)
 
     for(std::size_t i = 0; i < weights.size(); i++)
     {
-        for(int row = 0; row < weights[i].num_rows; row++)
+        for(std::uint32_t row = 0; row < weights[i].num_rows; row++)
         {
-            for(int col = 0; col < weights[i].num_cols; col++)
+            for(std::uint32_t col = 0; col < weights[i].num_cols; col++)
             {
                 weights[i][row][col] = dist(gen) * std::sqrt(2.0 / in_features_);
             }
@@ -147,9 +129,9 @@ Matrix NeuralNetwork::calculate_and_filter_gradient(Matrix& grad_output, Matrix&
 {
     Matrix filtered_gradient = grad_output;
     
-    for(int row = 0; row < pred.num_rows; row++)
+    for(std::uint32_t row = 0; row < pred.num_rows; row++)
     {
-        for(int col = 0; col < pred.num_cols; col++)
+        for(std::uint32_t col = 0; col < pred.num_cols; col++)
         {
             if(pred[row][col] == 0.0)
             {
@@ -166,7 +148,7 @@ void NeuralNetwork::backward_pass()
     Matrix filtered_gradient = calculate_and_filter_gradient(actual_prediction, input_cache_[1 + num_hidden_layers_]);
 
 
-    for(int i = num_hidden_layers_ + 1; i > 0; i--)
+    for(std::size_t i = num_hidden_layers_ + 1; i > 0; i--)
     {
 
         Matrix d_weight(layer_sizes_[i - 1], layer_sizes_[i]); //dW
