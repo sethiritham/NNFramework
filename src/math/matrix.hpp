@@ -11,8 +11,8 @@ class Matrix
 {
     // Init variables
     public:
-        int num_rows;
-        int num_cols;
+        std::uint32_t num_rows;
+        std::uint32_t num_cols;
     
     private:
         double *data;
