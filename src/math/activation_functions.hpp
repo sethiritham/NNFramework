@@ -5,4 +5,4 @@
 
 void update_using_ReLU(Matrix &m);
 
-void sigmoid(double &val);
+void update_using_sigmoid(Matrix &m);

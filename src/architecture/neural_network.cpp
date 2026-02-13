@@ -75,12 +75,16 @@ Matrix NeuralNetwork::forward_pass(Matrix &inputs)
 
         Matrix prev_pred = input_cache_[0];
 
-        for(std::size_t i = 0; i < num_hidden_layers_ + 1; i++)
+        for(std::size_t i = 0; i < num_hidden_layers_; i++)
         {
             prev_pred = Matrix::row_wise_sum(prev_pred*weights_[i], biases_[i]);
             update_using_ReLU(prev_pred);
             input_cache_.emplace_back(prev_pred);
         }
+
+        prev_pred = Matrix::row_wise_sum(prev_pred*weights_[num_hidden_layers_], biases_[num_hidden_layers_]);
+        update_using_sigmoid(prev_pred);
+        input_cache_.emplace_back(prev_pred);
 
         prev_pred.display_matrix();
 
@@ -125,7 +129,7 @@ void NeuralNetwork::update_init_weights_ReLU(std::vector<Matrix>& weights)
     }
 }
 
-Matrix NeuralNetwork::calculate_and_filter_gradient(Matrix& grad_output, Matrix& pred)
+Matrix NeuralNetwork::calculate_and_filter_gradient_ReLU(Matrix& grad_output, Matrix& pred)
 {
     Matrix filtered_gradient = grad_output;
     
@@ -143,9 +147,25 @@ Matrix NeuralNetwork::calculate_and_filter_gradient(Matrix& grad_output, Matrix&
     return filtered_gradient;
 }
 
+Matrix NeuralNetwork::calculate_and_filter_gradient_sigmoid(Matrix& grad_output)
+{
+
+    Matrix filtered_gradient = grad_output;
+    
+    for(std::uint32_t row = 0; row < grad_output.num_rows; row++)
+    {
+        for(std::uint32_t col = 0; col < grad_output.num_cols; col++)
+        {
+            filtered_gradient[row][col] = grad_output[row][col] * (1 - grad_output[row][col]);
+        }
+    } 
+
+    return filtered_gradient;
+}
+
 void NeuralNetwork::backward_pass()
 {
-    Matrix filtered_gradient = calculate_and_filter_gradient(actual_prediction, input_cache_[1 + num_hidden_layers_]);
+    Matrix filtered_gradient = calculate_and_filter_gradient_ReLU(actual_prediction, input_cache_[1 + num_hidden_layers_]);
 
 
     for(std::size_t i = num_hidden_layers_ + 1; i > 0; i--)
@@ -165,10 +185,13 @@ void NeuralNetwork::backward_pass()
 
         biases_[i - 1] = biases_[i - 1] - d_bias * learning_rate;
 
-        filtered_gradient = calculate_and_filter_gradient(grad_output, input_cache_[i - 1]);
+        if(!(i == num_hidden_layers_ + 1))
+        {
+            filtered_gradient = calculate_and_filter_gradient_ReLU(grad_output, input_cache_[i - 1]);
+        }
+        else
+        {
+            filtered_gradient = calculate_and_filter_gradient_sigmoid(grad_output);
+        }
     }
-}
-
-
-
-    
+}    

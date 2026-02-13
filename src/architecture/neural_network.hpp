@@ -33,7 +33,9 @@ class NeuralNetwork
          * @param pred The prediction matrix
          * @param actual The true prediction 
          */
-        Matrix calculate_and_filter_gradient(Matrix& pred, Matrix& loss);
+        Matrix calculate_and_filter_gradient_ReLU(Matrix& grad_output, Matrix& pred);
+
+        Matrix calculate_and_filter_gradient_sigmoid(Matrix& grad_output);
 
         double convert_loss_to_gradient(double element) 
         { 

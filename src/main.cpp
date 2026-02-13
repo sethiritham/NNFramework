@@ -8,7 +8,7 @@ int main()
     Matrix accurate_pred(7, 1);
 
     accurate_pred.fill_matrix_double(0.0, accurate_pred);
-    accurate_pred[1][0] = 10.0;
+    accurate_pred[1][0] = 1.0;
 
     NeuralNetwork nn(7, 1, 3, 7, 0.01);
 
@@ -57,6 +57,9 @@ int main()
 
     pred = nn.forward_pass(input);
 
+    LOG("PREDICTION MATRIX\n");
+    pred.display_matrix();
+
     loss_matrix = nn.loss_fn(pred, accurate_pred);
 
     LOG("LOSS NOW\n");
@@ -71,6 +74,4 @@ int main()
     LOG("BACKWARD PASS COMPLETE ONE OF THE WEIGHT AFTER");
     nn.weights_[2].display_matrix();
 
-
-    
 }
