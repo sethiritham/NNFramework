@@ -136,6 +136,11 @@ Matrix NeuralNetwork::calculate_and_filter_gradient(Matrix pred, Matrix actual)
     return filtered_gradient;
 }
 
+void NeuralNetwork::backward_pass(Matrix& filtered_gradient)
+{
+    
+}
+
 
 
     

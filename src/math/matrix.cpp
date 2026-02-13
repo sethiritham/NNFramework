@@ -177,7 +177,6 @@ bool Matrix::operator==(const Matrix &m) const
             }
         }
     }
-
     return true;
 }
 
@@ -227,6 +226,22 @@ Matrix Matrix::operator*(const Matrix &m) const
 
     return mult;
 
+}
+
+Matrix Matrix::operator*(const double scalar) const
+{
+
+    Matrix result(this->num_rows, this->num_cols);
+
+    for(int row = 0; row < this->num_rows; row++)
+    {
+        for(int col = 0; col < this->num_cols; col++)
+        {
+            result[row][col] = (*this)[row][col]*scalar; 
+        }
+    }
+
+    return result;
 }
 
 std::size_t Matrix::num_elements()
