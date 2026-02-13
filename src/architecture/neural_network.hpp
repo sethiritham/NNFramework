@@ -30,8 +30,13 @@ class NeuralNetwork
          * @param pred The prediction matrix
          * @param actual The true prediction 
          */
-        Matrix calculate_and_filter_gradient(Matrix pred, Matrix actual);
-    
+        Matrix calculate_and_filter_gradient(Matrix& loss);
+
+        double convert_loss_to_gradient(double element) 
+        { 
+            return std::pow(element, 0.5) * 2.0; 
+        }    
+
     public:
         /**
          * @brief Initiates the Neural Network
@@ -66,6 +71,6 @@ class NeuralNetwork
         /**
          * @brief exectues backward pass, weights and biases updated
          */
-        void backward_pass(Matrix& filtered_gradient);
+        void backward_pass(Matrix& loss, const double& learning_rate);
 };
 

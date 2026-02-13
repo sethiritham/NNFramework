@@ -126,20 +126,20 @@ class Matrix
             return iden_matrix;
         }
 
-        /**
-         * @brief Given function operated on every matrix elements
-         * @param f function to map over matrix
-         */
-        template<typename T, typename Func>
-        static Matrix map_matrix(const Matrix& m, Func& f)
+        static Matrix row_wise_sum(const Matrix &matrix, const Matrix &row_matrix)
         {
-            Matrix result(m.num_rows, m.num_cols);
-
-            for(int row = 0; row < m.num_rows; row++)
+            if(!(matrix.num_cols == row_matrix.num_cols))
             {
-                for(int col = 0; col < m.num_cols; col++)
+                return {};
+            }
+
+            Matrix result(matrix.num_rows, matrix.num_cols);
+
+            for(int row = 0; row < matrix.num_rows; row++)
+            {
+                for(int col = 0; col < matrix.num_cols; col++)
                 {
-                    result[row][col] = f(m[row][col]);
+                    result[row][col] = matrix[row][col] + row_matrix[0][col];
                 }
             }
 
@@ -202,3 +202,23 @@ class Matrix
          */
         Matrix operator*(const double scalar) const;
 };
+
+/**
+ * @brief Given function operated on every matrix elements
+ * @param f function to map over matrix
+ */
+template<typename T, typename Func>
+Matrix map_matrix(const Matrix& m, Func f)
+{
+    Matrix result(m.num_rows, m.num_cols);
+
+    for(int row = 0; row < m.num_rows; row++)
+    {
+        for(int col = 0; col < m.num_cols; col++)
+        {
+            result[row][col] = f(m[row][col]);
+        }
+    }
+
+    return result;
+}

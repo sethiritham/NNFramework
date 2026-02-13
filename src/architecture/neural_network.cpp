@@ -17,13 +17,13 @@ NeuralNetwork::NeuralNetwork(int input, int output, int hiddenL, int batchS)
         for (int i = 0; i < num_hidden_layers_ + 2;  i++)
         {
             layer_sizes_[i] = input - x*i;
+            input_cache_.emplace_back(batch_size_, layer_sizes_[i]);
         }
 
-        for(int i = 0; i < num_hidden_layers_ + 1; i++)
+        for(int j = 0; j < num_hidden_layers_ + 1; j++)
         {
-            weights_.emplace_back(layer_sizes_[i], layer_sizes_[i + 1]);
-            input_cache_.emplace_back(batch_size_, layer_sizes_[i]);
-            biases_.emplace_back(batch_size_, layer_sizes_[i + 1]);
+            weights_.emplace_back(layer_sizes_[j], layer_sizes_[j + 1]);
+            biases_.emplace_back(1, layer_sizes_[j + 1]);
         }
 
         LOG("WEIGHTS AND BIASES CHECK\nBIASES");
@@ -73,11 +73,13 @@ Matrix NeuralNetwork::forward_pass(Matrix &inputs)
         LOG("STARTED FORWARD PASS");
         input_cache_.clear(); //cleaing the input cache at the start of the forward pass 
 
-        Matrix prev_pred = inputs;
+        input_cache_.emplace_back(inputs);
+
+        Matrix prev_pred = input_cache_[0];
 
         for(int i = 0; i < num_hidden_layers_ + 1; i++)
         {
-            prev_pred = prev_pred*weights_[i] + biases_[i];
+            prev_pred = Matrix::row_wise_sum(prev_pred*weights_[i], biases_[i]);
             update_using_ReLU(prev_pred);
             input_cache_.emplace_back(prev_pred);
         }
@@ -119,12 +121,17 @@ void NeuralNetwork::update_init_weights_ReLU(std::vector<Matrix>& weights)
     }
 }
 
-Matrix NeuralNetwork::calculate_and_filter_gradient(Matrix pred, Matrix actual)
+Matrix NeuralNetwork::calculate_and_filter_gradient(Matrix& loss)
 {
-    Matrix filtered_gradient = pred - actual;
-    for(int row = 0; row < pred.num_rows; row++)
+    Matrix pred = forward_pass(input_cache_[1 + num_hidden_layers_]);
+
+    Matrix filtered_gradient = map_matrix<double>(filtered_gradient, [](double element) { 
+                return std::pow(element, 0.5) * 2.0;    
+    });
+    
+    for(int row = 0; row < filtered_gradient.num_rows; row++)
     {
-        for(int col = 0; col < pred.num_cols; col++)
+        for(int col = 0; col < filtered_gradient.num_cols; col++)
         {
             if(pred[row][col] == 0.0)
             {
@@ -136,9 +143,30 @@ Matrix NeuralNetwork::calculate_and_filter_gradient(Matrix pred, Matrix actual)
     return filtered_gradient;
 }
 
-void NeuralNetwork::backward_pass(Matrix& filtered_gradient)
+void NeuralNetwork::backward_pass(Matrix& loss, const double& learning_rate)
 {
-    
+    Matrix filtered_gradient = calculate_and_filter_gradient(loss);
+
+
+    for(int i = num_hidden_layers_ + 2; i > 0; i--)
+    {
+
+        Matrix d_weight(layer_sizes_[i - 2], layer_sizes_[i - 1]); //dW
+        Matrix d_bias(batch_size_, layer_sizes_[i - 1]); // db
+        Matrix grad_output(batch_size_, layer_sizes_[i - 2]); // input for next layer
+
+        grad_output = input_cache_[i - 1]; 
+
+        d_weight = ~grad_output*filtered_gradient;
+        d_bias = d_bias.collapse_horizontal(d_bias);
+
+        grad_output = filtered_gradient*(~weights_[i - 1]);
+
+        weights_[i - 1] = weights_[i - 1] - d_weight*learning_rate;
+
+        biases_[i - 1] = biases_[i - 1] - d_bias * learning_rate ;
+
+    }
 }
 
 
