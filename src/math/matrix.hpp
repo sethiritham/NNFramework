@@ -51,6 +51,11 @@ class Matrix
         double col_sum(Matrix &m, int col_index);
 
         /**
+         * @brief sum of all the elements in the Matrix
+         */
+        double sum_of_elements(Matrix& m);
+
+        /**
          * @brief returns the number of elements in the matrix
          */
         std::size_t num_elements();

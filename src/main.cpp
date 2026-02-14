@@ -39,11 +39,9 @@ int main()
     LOG("ACTUAL MATRIX\n");
     accurate_pred.display_matrix();
 
-    Matrix loss_matrix = nn.loss_fn(pred, accurate_pred);
+    double loss = nn.cross_entropy_loss(pred, accurate_pred);
 
-    LOG("LOSS MATRIX");
-    loss_matrix.display_matrix();
-
+    LOG("LOSS" << loss);
 
     LOG("ONE OF THE WEIGHTS BEFORE BACK PROP");
     nn.weights_[2].display_matrix();
@@ -60,11 +58,9 @@ int main()
     LOG("PREDICTION MATRIX\n");
     pred.display_matrix();
 
-    loss_matrix = nn.loss_fn(pred, accurate_pred);
+    loss = nn.loss_fn(pred, accurate_pred);
 
-    LOG("LOSS NOW\n");
-    loss_matrix.display_matrix();
-
+    LOG("LOSS NOW\n" << loss);
 
     LOG("ONE OF THE WEIGHTS BEFORE BACK PROP");
     nn.weights_[2].display_matrix();

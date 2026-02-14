@@ -29,13 +29,23 @@ class NeuralNetwork
         void update_init_weights_ReLU(std::vector<Matrix>& weights);
 
         /**
-         * @brief Gradient is d(Loss), activation for ReLU : gradient[i] = 0 if pred[i] = 0
-         * @param pred The prediction matrix
-         * @param actual The true prediction 
+         * @brief Gradient is d(Loss), activation for ReLU : gradient[i][j] = 0 if pred[i][j] = 0
+         * @param grad_output gradient output after forward pass
+         * @param pred prediction matrix  
          */
         Matrix calculate_and_filter_gradient_ReLU(Matrix& grad_output, Matrix& pred);
 
+        /**
+         * @brief Gradient is d(Loss), activation for sigmoid : gradient[i][j] = sigmoid(gradient[i][j])*(1 - gradient[i][j])
+         * @param grad_output gradient output after forward pass
+         */
         Matrix calculate_and_filter_gradient_sigmoid(Matrix& grad_output);
+
+        /**
+         * @brief Softmax + CrossEntropy loss gradient = pred - actual
+         * @param grad_output gradient output after forward pass
+         */
+        Matrix calculate_and_filter_gradient_softmax(Matrix& pred);
 
         double convert_loss_to_gradient(double element) 
         { 
@@ -71,7 +81,12 @@ class NeuralNetwork
         /**
          * @brief ReLU loss function
          */
-        Matrix loss_fn(Matrix& pred, Matrix& actual);
+        double loss_fn(const Matrix& pred,const Matrix& actual);
+
+        /**
+         * @brief Cross entropy loss function
+         */
+        double cross_entropy_loss(Matrix& log_pred, Matrix& actual);
 
         /**
          * @brief exectues backward pass, weights and biases updated

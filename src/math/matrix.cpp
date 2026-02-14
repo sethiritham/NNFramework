@@ -80,6 +80,21 @@ double Matrix::col_sum(Matrix &m, int col_index)
     return sum;
 }
 
+double Matrix::sum_of_elements(Matrix& m)
+{
+    double sum = 0;
+    for(std::uint32_t row = 0; row < this->num_rows; row++)
+    {
+        for(std::uint32_t col = 0; col < this->num_cols; col++)
+        {
+            sum += m[row][col];
+        }
+    }
+
+    return sum;
+}
+
+
 Matrix Matrix::collapse_horizontal(Matrix& m)
 {
     Matrix result(1, m.num_cols);
