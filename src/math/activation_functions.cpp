@@ -52,19 +52,19 @@ void update_using_LogSoftmax(Matrix& m)
         double max_val = -1.0 * std::numeric_limits<double>::infinity();
         double sum = 0.0;
         
-        for(std::uint32_t col = 0; col < m.num_cols; col++) 
+        for(std::uint32_t col1 = 0; col1 < m.num_cols; col1++) 
         {
-            if(m[row][col] > max_val) max_val = m[row][col];
+            if(m[row][col1] > max_val) max_val = m[row][col1];
         }
 
-        for(std::uint32_t col = 0; col < m.num_cols; col++)
+        for(std::uint32_t col2 = 0; col2 < m.num_cols; col2++)
         {
-            sum += std::exp(m[row][col] - max_val);
+            sum += std::exp(m[row][col2] - max_val);
         }
 
-        for(std::uint32_t col = 0; col < m.num_cols; col++)
+        for(std::uint32_t col3 = 0; col3 < m.num_cols; col3++)
         {
-            m[row][col] = m[row][col] - (std::log(sum) + max_val);
+            m[row][col3] = m[row][col3] - (std::log(sum) + max_val);
         }
 
     }

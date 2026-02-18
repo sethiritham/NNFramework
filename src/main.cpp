@@ -3,71 +3,40 @@
 
 int main()
 {
-    std::cout<<"STARTED"<<std::endl;
+    NeuralNetwork nn(5, 1, 2, 3, 0.01);
 
-    Matrix accurate_pred(7, 1);
+    Matrix input_matrix(3, 5);
 
-    accurate_pred.fill_matrix_double(0.0, accurate_pred);
-    accurate_pred[1][0] = 1.0;
 
-    NeuralNetwork nn(7, 1, 3, 7, 0.01);
-
-    std::cout<<"CREATED NEURAL NETWORK"<<std::endl;
-
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<double> dist(-7, 7);
-
-    Matrix input(7, 7);
-
-    for(int i = 0; i < 7; i++)
+    for(int k = 0; k < 4; k++)
     {
-        for(int j = 0; j < 7; j++)
+        static std::random_device rd;
+        static std::mt19937 gen(rd());
+        std::uniform_real_distribution<> dis(0.0, 1.0);
+
+        for(int i = 0; i < input_matrix.num_rows; i ++)
         {
-            input[i][j] = dist(gen);
+            for(int j = 0; j < input_matrix.num_cols; j++)
+            {
+                input_matrix[i][j] = dis(gen);
+            }
         }
+
+        Matrix actual_prediction_matrix(3, 1);
+
+        actual_prediction_matrix.fill_matrix_double(0.0, actual_prediction_matrix);
+        actual_prediction_matrix[2][0] = 1.0;
+
+        Matrix pred(3, 1);
+
+        pred = nn.forward_pass(input_matrix);
+        double loss = 0.0;
+
+        loss = nn.loss_fn(pred, actual_prediction_matrix);
+
+        nn.backward_pass();
+
+        LOG("LOSS IS: "<<std::endl<<loss);
     }
-
-    LOG("INPUT MATRIX\n");
-    input.display_matrix();
-
-    Matrix pred = nn.forward_pass(input);
-
-    LOG("PREDICTION MATRIX\n");
-    pred.display_matrix();
-
-    LOG("ACTUAL MATRIX\n");
-    accurate_pred.display_matrix();
-
-    double loss = nn.cross_entropy_loss(pred, accurate_pred);
-
-    LOG("LOSS" << loss);
-
-    LOG("ONE OF THE WEIGHTS BEFORE BACK PROP");
-    nn.weights_[2].display_matrix();
-
-    nn.backward_pass();
-
-    LOG("BACKWARD PASS COMPLETE ONE OF THE WEIGHT AFTER");
-    nn.weights_[2].display_matrix();
-
-    LOG("SECOND FORWARD PASS NOW");
-
-    pred = nn.forward_pass(input);
-
-    LOG("PREDICTION MATRIX\n");
-    pred.display_matrix();
-
-    loss = nn.loss_fn(pred, accurate_pred);
-
-    LOG("LOSS NOW\n" << loss);
-
-    LOG("ONE OF THE WEIGHTS BEFORE BACK PROP");
-    nn.weights_[2].display_matrix();
-
-    nn.backward_pass();
-
-    LOG("BACKWARD PASS COMPLETE ONE OF THE WEIGHT AFTER");
-    nn.weights_[2].display_matrix();
-
+    
 }

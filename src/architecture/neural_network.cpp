@@ -83,12 +83,9 @@ Matrix NeuralNetwork::forward_pass(Matrix &inputs)
         }
 
         prev_pred = Matrix::row_wise_sum(prev_pred*weights_[num_hidden_layers_], biases_[num_hidden_layers_]);
-        LOG("PREV PRED BEFORE SOFTMAX\n");
-        prev_pred.display_matrix();
-        update_using_LogSoftmax(prev_pred);
+        
+        update_using_sigmoid(prev_pred);
         input_cache_.emplace_back(prev_pred);
-
-        prev_pred.display_matrix();
 
         return prev_pred;
     }
@@ -111,7 +108,7 @@ double NeuralNetwork::loss_fn(const Matrix& pred, const Matrix& actual)
         {
             for(std::uint32_t j = 0; j < squared_diff.num_cols; j++)
             {
-                loss += squared_diff[i][j];
+                loss += std::abs(squared_diff[i][j]);
             }
         }
         
@@ -123,8 +120,7 @@ double NeuralNetwork::loss_fn(const Matrix& pred, const Matrix& actual)
 double NeuralNetwork::cross_entropy_loss(Matrix& log_pred, Matrix& actual)
     {
         actual_prediction = actual;
-
-        double loss;
+        double loss = 0.0;
 
         for(std::uint32_t i = 0; i < actual.num_rows; i++)
         {
@@ -144,16 +140,16 @@ void NeuralNetwork::update_init_weights_ReLU(std::vector<Matrix>& weights)
 {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<double> dist(in_features_, out_features_);
 
     for(std::size_t i = 0; i < weights.size(); i++)
     {
+        std::normal_distribution<double> dist(0, std::sqrt(2.0 / weights[i].num_cols));
         for(std::uint32_t row = 0; row < weights[i].num_rows; row++)
         {
             for(std::uint32_t col = 0; col < weights[i].num_cols; col++)
             {
-                weights[i][row][col] = dist(gen) * std::sqrt(2.0 / in_features_);
-            }
+                weights[i][row][col] = dist(gen);
+            }   
         }
     }
 }
@@ -195,7 +191,6 @@ Matrix NeuralNetwork::calculate_and_filter_gradient_sigmoid(Matrix& grad_output)
 Matrix NeuralNetwork::calculate_and_filter_gradient_softmax(Matrix& pred)
 {   
     pred.display_matrix();
-    actual_prediction.display_matrix();
     return (pred - actual_prediction);
 }
 
@@ -221,13 +216,6 @@ void NeuralNetwork::backward_pass()
 
         biases_[i - 1] = biases_[i - 1] - d_bias * learning_rate;
 
-        if(!(i == num_hidden_layers_ + 1))
-        {
-            filtered_gradient = calculate_and_filter_gradient_ReLU(grad_output, input_cache_[i - 1]);
-        }
-        else
-        {
-            filtered_gradient = calculate_and_filter_gradient_softmax(grad_output);
-        }
+        filtered_gradient = calculate_and_filter_gradient_ReLU(grad_output, input_cache_[i - 1]);
     }
 }    
