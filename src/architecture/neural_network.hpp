@@ -93,4 +93,3 @@ class NeuralNetwork
          */
         void backward_pass();
 };
-

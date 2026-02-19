@@ -267,3 +267,21 @@ std::size_t Matrix::num_elements()
 {
     return this->num_rows * this->num_cols;
 }
+
+void Matrix::show_dimensions()
+{
+    std::map<std::string, int> dimensions;
+    dimensions["COLUMNS"] = this->num_cols;
+    dimensions["ROWS"] = this->num_rows;
+
+    for (const auto& [key, value] : dimensions) 
+    {
+    std::cout << key << " => " << value << std::endl;
+    }
+
+}
+
+
+    
+
+

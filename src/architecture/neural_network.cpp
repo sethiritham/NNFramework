@@ -50,17 +50,22 @@ NeuralNetwork::NeuralNetwork(std::size_t input, std::size_t output, std::vector<
 
         int prev = input;
 
-        for (std::size_t i = 0; i < num_hidden_layers_;  i++)
+        layer_sizes_[0] = in_features_;
+        layer_sizes_[hidden_sz.size() + 1] = out_features_;
+        for(std::size_t i = 0; i < num_hidden_layers_; i++)
         {
-            layer_sizes_[i] = prev - x;
-            prev = layer_sizes_[i];
+            layer_sizes_[i + 1] = hidden_sz[i];
         }
 
-        for(std::size_t i = 0; i < num_hidden_layers_ + 1; i++)
+        for(std::size_t j = 0; j < num_hidden_layers_ + 1; j++)
         {
-            weights_.emplace_back(input, output);
-            input_cache_.emplace_back(batch_size_, input);
-            biases_.emplace_back(batch_size_, out_features_);
+            weights_.emplace_back(layer_sizes_[j], layer_sizes_[j + 1]);
+            biases_.emplace_back(1, layer_sizes_[j + 1]);
+        }
+
+        for (std::size_t i = 0; i < num_hidden_layers_ + 2;  i++)
+        {
+            input_cache_.emplace_back(batch_size_, layer_sizes_[i]);
         }
 
         update_init_weights_ReLU(weights_);
@@ -68,7 +73,7 @@ NeuralNetwork::NeuralNetwork(std::size_t input, std::size_t output, std::vector<
 
 Matrix NeuralNetwork::forward_pass(Matrix &inputs)
     {
-        LOG("STARTED FORWARD PASS");
+        LOG("STARTING FORWARD PASS\n");
         input_cache_.clear(); //cleaing the input cache at the start of the forward pass 
 
         input_cache_.emplace_back(inputs);
@@ -78,7 +83,9 @@ Matrix NeuralNetwork::forward_pass(Matrix &inputs)
         for(std::size_t i = 0; i < num_hidden_layers_; i++)
         {
             prev_pred = Matrix::row_wise_sum(prev_pred*weights_[i], biases_[i]);
+
             update_using_ReLU(prev_pred);
+
             input_cache_.emplace_back(prev_pred);
         }
 
@@ -216,6 +223,13 @@ void NeuralNetwork::backward_pass()
 
         biases_[i - 1] = biases_[i - 1] - d_bias * learning_rate;
 
-        filtered_gradient = calculate_and_filter_gradient_ReLU(grad_output, input_cache_[i - 1]);
+        if(i == num_hidden_layers_ + 1)
+        {
+            filtered_gradient = calculate_and_filter_gradient_sigmoid(grad_output);
+        }
+        else
+        {
+            filtered_gradient = calculate_and_filter_gradient_ReLU(grad_output, input_cache_[i - 1]);
+        }
     }
 }    

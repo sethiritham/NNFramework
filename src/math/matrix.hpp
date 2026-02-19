@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <stdexcept> 
+#include <map>
 #define LOG(x) std::cout<<x<<std::endl
 #include <string>
 
@@ -65,6 +66,11 @@ class Matrix
          * all the elements of a given columns are added to return 
          */
         Matrix collapse_horizontal(Matrix& m);
+
+        /**
+         * @brief Shows the dimensions of the matrix object
+         */
+        void show_dimensions();
 
         /**
          * @param data pointer freed
