@@ -191,8 +191,10 @@ Matrix Matrix::operator*(const Matrix &m) const {
 
   for (size_t row = 0; row < this->num_rows; row++) {
     for (size_t col = 0; col < this->num_cols; col++) {
-      int sum = 0;
-      sum += (*this)[row][col] * m[col][row];
+      double scalar = (*this)[row][col];
+      for (size_t k = 0; k < m.num_cols; k++) {
+        mult[row][k] = scalar * m[col][k];
+      }
     }
   }
 
