@@ -59,15 +59,18 @@ int main() {
 
   actual_prediction_matrix.display_matrix();
 
-  for (int k = 0; k < 1; k++) {
+  double total_time = 0.0;
+  for (int k = 0; k < 1000; k++) {
     double loss = 0.0;
 
     Matrix pred(num_samples, 10);
 
-    {
-      ScopeTimer timer("FORWARD PASS");
-      pred = nn.forward_pass(input_matrix);
-    }
+    ScopeTimer timer("FORWARD PASS");
+    pred = nn.forward_pass(input_matrix);
+
+    timer.time_display();
+
+    total_time += timer.get_time_ms();
 
     loss = nn.cross_entropy_loss(pred, actual_prediction_matrix);
 
@@ -75,4 +78,7 @@ int main() {
 
     LOG("LOSS IS: " << std::endl << loss);
   }
+
+  LOG("AVERAGE TIME DURATION BEFORE CACHE TILING: " << total_time / 1000.0
+                                                    << "ms");
 }

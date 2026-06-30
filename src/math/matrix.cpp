@@ -1,4 +1,5 @@
 #include "matrix.hpp"
+#include <cstddef>
 #include <iomanip>
 #include <iostream>
 #include <map>
@@ -188,14 +189,10 @@ Matrix Matrix::operator*(const Matrix &m) const {
 
   Matrix mult(this->num_rows, m.num_cols);
 
-  for (std::uint32_t i = 0; i < this->num_rows; i++) {
-    for (std::uint32_t j = 0; j < m.num_cols; j++) {
-      double sum = 0.0;
-      for (std::uint32_t k = 0; k < this->num_cols; k++) {
-        sum += (*this)[i][k] * m[k][j];
-      }
-
-      mult[i][j] = sum;
+  for (size_t row = 0; row < this->num_rows; row++) {
+    for (size_t col = 0; col < this->num_cols; col++) {
+      int sum = 0;
+      sum += (*this)[row][col] * m[col][row];
     }
   }
 
