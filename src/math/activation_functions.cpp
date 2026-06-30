@@ -1,0 +1,63 @@
+#include "activation_functions.hpp"
+#include "matrix.hpp"
+#include <cmath>
+#include <cstdint>
+
+void update_using_ReLU(Matrix &m) {
+  for (std::uint32_t row = 0; row < m.num_rows; row++) {
+    for (std::uint32_t col = 0; col < m.num_cols; col++) {
+      m[row][col] = (m[row][col] < 0) ? 0 : m[row][col];
+    }
+  }
+}
+
+void update_using_sigmoid(Matrix &m) {
+  for (std::uint32_t row = 0; row < m.num_rows; row++) {
+    for (std::uint32_t col = 0; col < m.num_cols; col++) {
+      double &val = m[row][col];
+      m[row][col] = std::pow((1 + std::exp(-val)), -1);
+    }
+  }
+}
+
+void update_using_softmax(Matrix &m) {
+  for (std::uint32_t row = 0; row < m.num_rows; row++) {
+
+    double max_val = m[row][0];
+    for (std::uint32_t col = 1; col < m.num_cols; col++) {
+      if (max_val < m[row][col]) {
+        max_val = m[row][col];
+      }
+    }
+
+    double sum_of_all = 0.0;
+
+    for (std::uint32_t col = 0; col < m.num_cols; col++) {
+      sum_of_all += std::exp(m[row][col] - max_val);
+    }
+
+    for (std::uint32_t col = 0; col < m.num_cols; col++) {
+      m[row][col] = std::exp(m[row][col] - max_val) / sum_of_all;
+    }
+  }
+}
+
+void update_using_LogSoftmax(Matrix &m) {
+  for (std::uint32_t row = 0; row < m.num_rows; row++) {
+    double max_val = -1.0 * std::numeric_limits<double>::infinity();
+    double sum = 0.0;
+
+    for (std::uint32_t col1 = 0; col1 < m.num_cols; col1++) {
+      if (m[row][col1] > max_val)
+        max_val = m[row][col1];
+    }
+
+    for (std::uint32_t col2 = 0; col2 < m.num_cols; col2++) {
+      sum += std::exp(m[row][col2] - max_val);
+    }
+
+    for (std::uint32_t col3 = 0; col3 < m.num_cols; col3++) {
+      m[row][col3] = m[row][col3] - (std::log(sum) + max_val);
+    }
+  }
+}
