@@ -43,45 +43,53 @@ void load_mnist_csv(const std::string &filename, Matrix &X, Matrix &Y,
 
 int main() {
 
+  std::vector<Matrix> weights;
+  std::vector<Matrix> biases;
+
   int num_samples = 8;
 
   NeuralNetwork nn(784, 10, {256, 128}, num_samples, 1e-4);
 
-  Matrix input_matrix(num_samples, 784);
-  Matrix actual_prediction_matrix(num_samples, 10);
+  nn.load_model_txt(
+      "/mnt/5b2b3cbe-5bcb-4a72-a855-bc9cc94ccf4f/RITHAM/CODES/C++/"
+      "NNFramework/data/mnist_train.csv",
+      weights, biases);
 
-  actual_prediction_matrix.fill_matrix_double(0, actual_prediction_matrix);
-  input_matrix.fill_matrix_double(0, input_matrix);
-
-  load_mnist_csv("/mnt/5b2b3cbe-5bcb-4a72-a855-bc9cc94ccf4f/RITHAM/CODES/C++/"
-                 "NNFramework/data/mnist_train.csv",
-                 input_matrix, actual_prediction_matrix, num_samples);
-
-  actual_prediction_matrix.display_matrix();
-
-  double total_time = 0.0;
-  for (int k = 0; k < 1000; k++) {
-    double loss = 0.0;
-
-    Matrix pred(num_samples, 10);
-
-    ScopeTimer timer("FORWARD PASS");
-    pred = nn.forward_pass(input_matrix);
-
-    timer.time_display();
-
-    total_time += timer.get_time_ms();
-
-    loss = nn.cross_entropy_loss(pred, actual_prediction_matrix);
-
-    nn.backward_pass();
-
-    LOG("LOSS IS: " << std::endl << loss);
-  }
-
-  LOG("AVERAGE TIME DURATION AFTER CACHE TILING: " << total_time / 1000.0
-                                                   << "ms");
-
-  nn.save_model_csv("/mnt/5b2b3cbe-5bcb-4a72-a855-bc9cc94ccf4f/RITHAM/CODES/"
-                    "C++/NNFramework/model.txt");
+  // Matrix input_matrix(num_samples, 784);
+  // Matrix actual_prediction_matrix(num_samples, 10);
+  //
+  // actual_prediction_matrix.fill_matrix_double(0, actual_prediction_matrix);
+  // input_matrix.fill_matrix_double(0, input_matrix);
+  //
+  // load_mnist_csv("/mnt/5b2b3cbe-5bcb-4a72-a855-bc9cc94ccf4f/RITHAM/CODES/C++/"
+  //                "NNFramework/data/mnist_train.csv",
+  //                input_matrix, actual_prediction_matrix, num_samples);
+  //
+  // actual_prediction_matrix.display_matrix();
+  //
+  // double total_time = 0.0;
+  // for (int k = 0; k < 1000; k++) {
+  //   double loss = 0.0;
+  //
+  //   Matrix pred(num_samples, 10);
+  //
+  //   ScopeTimer timer("FORWARD PASS");
+  //   pred = nn.forward_pass(input_matrix);
+  //
+  //   timer.time_display();
+  //
+  //   total_time += timer.get_time_ms();
+  //
+  //   loss = nn.cross_entropy_loss(pred, actual_prediction_matrix);
+  //
+  //   nn.backward_pass();
+  //
+  //   LOG("LOSS IS: " << std::endl << loss);
+  // }
+  //
+  // LOG("AVERAGE TIME DURATION AFTER CACHE TILING: " << total_time / 1000.0
+  //                                                  << "ms");
+  //
+  // nn.save_model_csv("/mnt/5b2b3cbe-5bcb-4a72-a855-bc9cc94ccf4f/RITHAM/CODES/"
+  //                   "C++/NNFramework/model.txt");
 }

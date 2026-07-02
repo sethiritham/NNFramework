@@ -273,7 +273,7 @@ void NeuralNetwork::load_model_txt(const char *filepath,
     return;
   }
 
-  int num_weights_bias = 0;
+  size_t num_weights_bias = 0;
 
   saved_state >> num_weights_bias;
 
@@ -281,8 +281,30 @@ void NeuralNetwork::load_model_txt(const char *filepath,
   biases.reserve(num_weights_bias);
 
   for (size_t i = 0; i < num_weights_bias; i++) {
-    int n_rows = 0;
-    int n_cols = 0;
-    for (size_t j = 0; j <)
+    size_t n_rows = 0;
+    size_t n_cols = 0;
+
+    saved_state >> n_rows;
+    saved_state >> n_cols;
+    for (size_t j = 0; j < n_rows; j++) {
+      for (size_t k = 0; k < n_cols; k++) {
+        saved_state >> weights[i][j][k];
+      }
+    }
   }
+
+  for (size_t i = 0; i < num_weights_bias; i++) {
+    size_t n_rows = 0;
+    size_t n_cols = 0;
+
+    saved_state >> n_rows;
+    saved_state >> n_cols;
+    for (size_t j = 0; j < n_rows; j++) {
+      for (size_t k = 0; k < n_cols; k++) {
+        saved_state >> biases[i][j][k];
+      }
+    }
+  }
+
+  LOG("MODEL STATE LOADED! ");
 }
