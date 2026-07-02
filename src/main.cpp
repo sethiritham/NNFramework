@@ -79,6 +79,9 @@ int main() {
     LOG("LOSS IS: " << std::endl << loss);
   }
 
-  LOG("AVERAGE TIME DURATION BEFORE CACHE TILING: " << total_time / 1000.0
-                                                    << "ms");
+  LOG("AVERAGE TIME DURATION AFTER CACHE TILING: " << total_time / 1000.0
+                                                   << "ms");
+
+  nn.save_model_csv("/mnt/5b2b3cbe-5bcb-4a72-a855-bc9cc94ccf4f/RITHAM/CODES/"
+                    "C++/NNFramework/model.txt");
 }

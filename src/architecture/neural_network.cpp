@@ -1,7 +1,13 @@
 #include "neural_network.hpp"
 #include "activation_functions.hpp"
+#include "matrix.hpp"
 #include <cstddef>
 #include <cstdint>
+#include <fstream>
+#include <iomanip>
+#include <limits>
+#include <ostream>
+#include <random>
 
 // PUBLIC FUNCTIONS
 NeuralNetwork::NeuralNetwork(std::size_t input, std::size_t output,
@@ -219,5 +225,64 @@ void NeuralNetwork::backward_pass() {
         weights_[i - 1] - d_weight * (learning_rate / batch_size_);
 
     biases_[i - 1] = biases_[i - 1] - d_bias * (learning_rate / batch_size_);
+  }
+}
+
+void NeuralNetwork::save_model_csv(const char *filepath) {
+  std::ofstream saved_state(filepath);
+  saved_state << std::setprecision(std::numeric_limits<double>::max_digits10);
+
+  if (!saved_state) {
+    LOG("COULD NOT OPEN FILE!");
+    return;
+  }
+
+  // saving the number of layers as well, will be useful during deserialisation
+  saved_state << weights_.size() << " ";
+
+  for (size_t i = 0; i < weights_.size(); i++) {
+    saved_state << weights_[i].num_rows << " " << weights_[i].num_cols << " ";
+    for (size_t j = 0; j < weights_[i].num_rows; j++) {
+      for (size_t k = 0; k < weights_[i].num_cols; k++) {
+        saved_state << weights_[i][j][k] << " ";
+      }
+    }
+  }
+
+  for (size_t i = 0; i < biases_.size(); i++) {
+    saved_state << biases_[i].num_rows << " " << weights_[i].num_cols << " ";
+    for (size_t j = 0; j < biases_[i].num_rows; j++) {
+      for (size_t k = 0; k < biases_[i].num_cols; k++) {
+        saved_state << biases_[i][j][k] << " ";
+      }
+    }
+  }
+
+  saved_state.close();
+
+  LOG("MODEL SAVED! ");
+}
+
+void NeuralNetwork::load_model_txt(const char *filepath,
+                                   std::vector<Matrix> &weights,
+                                   std::vector<Matrix> &biases) {
+  std::ifstream saved_state(filepath);
+
+  if (!saved_state) {
+    LOG("COULD NOT OPEN FILE! ");
+    return;
+  }
+
+  int num_weights_bias = 0;
+
+  saved_state >> num_weights_bias;
+
+  weights.reserve(num_weights_bias);
+  biases.reserve(num_weights_bias);
+
+  for (size_t i = 0; i < num_weights_bias; i++) {
+    int n_rows = 0;
+    int n_cols = 0;
+    for (size_t j = 0; j <)
   }
 }

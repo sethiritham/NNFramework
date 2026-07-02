@@ -1,7 +1,6 @@
 #pragma once
 #include "matrix.hpp"
 #include <cmath>
-#include <random>
 #include <vector>
 
 class NeuralNetwork {
@@ -96,4 +95,9 @@ public:
    * @brief exectues backward pass, weights and biases updated
    */
   void backward_pass();
+
+  void save_model_csv(const char *filepath);
+
+  void load_model_txt(const char *filepath, std::vector<Matrix> &weights,
+                      std::vector<Matrix> &biases);
 };

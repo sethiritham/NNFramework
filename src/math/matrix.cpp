@@ -189,11 +189,13 @@ Matrix Matrix::operator*(const Matrix &m) const {
 
   Matrix mult(this->num_rows, m.num_cols);
 
+  mult.fill_matrix_double(0, mult);
+
   for (size_t row = 0; row < this->num_rows; row++) {
     for (size_t col = 0; col < this->num_cols; col++) {
       double scalar = (*this)[row][col];
       for (size_t k = 0; k < m.num_cols; k++) {
-        mult[row][k] = scalar * m[col][k];
+        mult[row][k] += scalar * m[col][k];
       }
     }
   }
