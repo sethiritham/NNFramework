@@ -98,6 +98,5 @@ public:
 
   void save_model_csv(const char *filepath);
 
-  void load_model_txt(const char *filepath, std::vector<Matrix> &weights,
-                      std::vector<Matrix> &biases);
+  void load_model_txt(const char *filepath);
 };

@@ -250,7 +250,7 @@ void NeuralNetwork::save_model_csv(const char *filepath) {
   }
 
   for (size_t i = 0; i < biases_.size(); i++) {
-    saved_state << biases_[i].num_rows << " " << weights_[i].num_cols << " ";
+    saved_state << biases_[i].num_rows << " " << biases_[i].num_cols << " ";
     for (size_t j = 0; j < biases_[i].num_rows; j++) {
       for (size_t k = 0; k < biases_[i].num_cols; k++) {
         saved_state << biases_[i][j][k] << " ";
@@ -263,9 +263,7 @@ void NeuralNetwork::save_model_csv(const char *filepath) {
   LOG("MODEL SAVED! ");
 }
 
-void NeuralNetwork::load_model_txt(const char *filepath,
-                                   std::vector<Matrix> &weights,
-                                   std::vector<Matrix> &biases) {
+void NeuralNetwork::load_model_txt(const char *filepath) {
   std::ifstream saved_state(filepath);
 
   if (!saved_state) {
@@ -277,9 +275,6 @@ void NeuralNetwork::load_model_txt(const char *filepath,
 
   saved_state >> num_weights_bias;
 
-  weights.reserve(num_weights_bias);
-  biases.reserve(num_weights_bias);
-
   for (size_t i = 0; i < num_weights_bias; i++) {
     size_t n_rows = 0;
     size_t n_cols = 0;
@@ -288,7 +283,7 @@ void NeuralNetwork::load_model_txt(const char *filepath,
     saved_state >> n_cols;
     for (size_t j = 0; j < n_rows; j++) {
       for (size_t k = 0; k < n_cols; k++) {
-        saved_state >> weights[i][j][k];
+        saved_state >> weights_[i][j][k];
       }
     }
   }
@@ -301,7 +296,7 @@ void NeuralNetwork::load_model_txt(const char *filepath,
     saved_state >> n_cols;
     for (size_t j = 0; j < n_rows; j++) {
       for (size_t k = 0; k < n_cols; k++) {
-        saved_state >> biases[i][j][k];
+        saved_state >> biases_[i][j][k];
       }
     }
   }

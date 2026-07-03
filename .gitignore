@@ -8,3 +8,5 @@ neural_network_roadmap.md
 *.csv
 *.png
 *.py
+src/*.o
+
