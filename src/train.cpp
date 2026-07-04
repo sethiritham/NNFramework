@@ -6,6 +6,13 @@
 #include <string>
 #include <vector>
 
+/**
+ *@brief processes the MNIST dataset
+ *@param filename Entire filepath with the filename
+ *@param X the input matrix for the NN
+ *@param Y the actual(ideal) prediction output
+ *@param num_samples Batch size
+ */
 void load_mnist_csv(const std::string &filename, Matrix &X, Matrix &Y,
                     int num_samples) {
   std::ifstream file(filename);
@@ -62,7 +69,7 @@ int main() {
   actual_prediction_matrix.display_matrix();
 
   double total_time = 0.0;
-  for (int k = 0; k < 1000; k++) {
+  for (int k = 0; k < 20000; k++) {
     double loss = 0.0;
 
     Matrix pred(num_samples, 10);
@@ -81,7 +88,7 @@ int main() {
     LOG("LOSS IS: " << std::endl << loss);
   }
 
-  LOG("AVERAGE TIME DURATION AFTER CACHE TILING: " << total_time / 2000.0
+  LOG("AVERAGE TIME DURATION AFTER CACHE TILING: " << total_time / 20000.0
                                                    << "ms");
 
   nn.save_model_bin("/mnt/5b2b3cbe-5bcb-4a72-a855-bc9cc94ccf4f/RITHAM/CODES/"

@@ -96,11 +96,23 @@ public:
    */
   void backward_pass();
 
+  /**
+   * @brief saves the weights and biases (txt)
+   */
   void save_model_txt(const char *filepath);
 
+  /**
+   * @brief loads the model file (txt)
+   */
   void load_model_txt(const char *filepath);
 
+  /**
+   * @brief saves the weights and biases (binary)
+   */
   void save_model_bin(const char *filepath);
 
+  /**
+   * @brief loads the model file (binary)
+   */
   void load_model_bin(const char *filepath);
 };

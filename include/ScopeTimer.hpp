@@ -2,6 +2,10 @@
 #include <iostream>
 #include <string>
 
+/**
+ * @brief calculates the time across the calling of time_display till end of
+ * Scope
+ */
 struct ScopeTimer {
   std::chrono::time_point<std::chrono::high_resolution_clock> start;
   std::string scope_name;
