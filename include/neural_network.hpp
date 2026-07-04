@@ -96,7 +96,11 @@ public:
    */
   void backward_pass();
 
-  void save_model_csv(const char *filepath);
+  void save_model_txt(const char *filepath);
 
   void load_model_txt(const char *filepath);
+
+  void save_model_bin(const char *filepath);
+
+  void load_model_bin(const char *filepath);
 };

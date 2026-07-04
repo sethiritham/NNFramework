@@ -228,7 +228,7 @@ void NeuralNetwork::backward_pass() {
   }
 }
 
-void NeuralNetwork::save_model_csv(const char *filepath) {
+void NeuralNetwork::save_model_txt(const char *filepath) {
   std::ofstream saved_state(filepath);
   saved_state << std::setprecision(std::numeric_limits<double>::max_digits10);
 
@@ -302,4 +302,93 @@ void NeuralNetwork::load_model_txt(const char *filepath) {
   }
 
   LOG("MODEL STATE LOADED! ");
+}
+
+void NeuralNetwork::save_model_bin(const char *filepath) {
+  std::ofstream saved_state(filepath, std::ios::binary);
+
+  if (!saved_state) {
+    LOG("COULD NOT OPEN FILE!");
+    return;
+  }
+
+  size_t num_weights_bias = weights_.size();
+
+  saved_state.write(reinterpret_cast<const char *>(&num_weights_bias),
+                    sizeof(num_weights_bias));
+
+  for (size_t i = 0; i < num_weights_bias; i++) {
+    uint32_t rows = weights_[i].num_rows;
+    uint32_t cols = weights_[i].num_cols;
+
+    saved_state.write(reinterpret_cast<const char *>(&rows), sizeof(rows));
+
+    saved_state.write(reinterpret_cast<const char *>(&cols), sizeof(cols));
+
+    for (uint32_t row = 0; row < rows; row++) {
+      for (uint32_t col = 0; col < cols; col++) {
+        double val = weights_[i][row][col];
+        saved_state.write(reinterpret_cast<const char *>(&val), sizeof(val));
+      }
+    }
+
+    rows = biases_[i].num_rows;
+    cols = biases_[i].num_cols;
+
+    saved_state.write(reinterpret_cast<const char *>(&rows), sizeof(rows));
+    saved_state.write(reinterpret_cast<const char *>(&cols), sizeof(cols));
+
+    for (uint32_t row = 0; row < rows; row++) {
+      for (uint32_t col = 0; col < cols; col++) {
+        double val = biases_[i][row][col];
+        saved_state.write(reinterpret_cast<const char *>(&val), sizeof(val));
+      }
+    }
+  }
+
+  LOG("MODEL SAVED!");
+}
+
+void NeuralNetwork::load_model_bin(const char *filepath) {
+  std::ifstream saved_state(filepath, std::ios::binary);
+
+  if (!saved_state.is_open()) {
+    LOG("COULD NOT OPEN THE FILE!");
+    return;
+  }
+
+  size_t num_weights_bias = 0;
+
+  saved_state.read(reinterpret_cast<char *>(&num_weights_bias),
+                   sizeof(num_weights_bias));
+
+  for (size_t i = 0; i < num_weights_bias; i++) {
+    uint32_t rows = 0;
+    uint32_t cols = 0;
+
+    saved_state.read(reinterpret_cast<char *>(&rows), sizeof(rows));
+    saved_state.read(reinterpret_cast<char *>(&cols), sizeof(cols));
+
+    for (uint32_t row = 0; row < rows; row++) {
+      for (uint32_t col = 0; col < cols; col++) {
+        saved_state.read(reinterpret_cast<char *>(&weights_[i][row][col]),
+                         sizeof(double));
+      }
+    }
+
+    rows = 0;
+    cols = 0;
+
+    saved_state.read(reinterpret_cast<char *>(&rows), sizeof(rows));
+    saved_state.read(reinterpret_cast<char *>(&cols), sizeof(cols));
+
+    for (uint32_t row = 0; row < rows; row++) {
+      for (uint32_t col = 0; col < cols; col++) {
+        saved_state.read(reinterpret_cast<char *>(&biases_[i][row][col]),
+                         sizeof(double));
+      }
+    }
+  }
+
+  LOG("MODEL LOADED!");
 }

@@ -48,8 +48,8 @@ int main() {
 
   NeuralNetwork nn(784, 10, {256, 128}, num_samples, 1e-4);
 
-  nn.load_model_txt("/mnt/5b2b3cbe-5bcb-4a72-a855-bc9cc94ccf4f/RITHAM/CODES/"
-                    "C++/NNFramework/model.txt");
+  nn.load_model_bin("/mnt/5b2b3cbe-5bcb-4a72-a855-bc9cc94ccf4f/RITHAM/CODES/"
+                    "C++/NNFramework/model.bin");
 
   double acc = 0.0;
 

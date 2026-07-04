@@ -9,4 +9,5 @@ neural_network_roadmap.md
 *.png
 *.py
 src/*.o
+*.bin
 

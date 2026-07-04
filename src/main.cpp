@@ -62,7 +62,7 @@ int main() {
   actual_prediction_matrix.display_matrix();
 
   double total_time = 0.0;
-  for (int k = 0; k < 1000; k++) {
+  for (int k = 0; k < 20000; k++) {
     double loss = 0.0;
 
     Matrix pred(num_samples, 10);
@@ -84,6 +84,6 @@ int main() {
   LOG("AVERAGE TIME DURATION AFTER CACHE TILING: " << total_time / 2000.0
                                                    << "ms");
 
-  nn.save_model_bin("/mnt/5b2b3cbe-5bcb-4a72-a855-bc9cc94ccf4f/RITHAM/CODES/"
-                    "C++/NNFramework/model.bin");
+  nn.save_model_txt("/mnt/5b2b3cbe-5bcb-4a72-a855-bc9cc94ccf4f/RITHAM/CODES/"
+                    "C++/NNFramework/model.txt");
 }

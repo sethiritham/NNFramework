@@ -14,7 +14,7 @@ TARGET_TRAIN = train_engine
 TARGET_PREDICT = inference_engine
 
 SHARED_SRCS = $(wildcard src/math/*.cpp) $(wildcard src/architecture/*.cpp)
-SHARED_OBJS = $(SHARED_SRCS:*.cpp=.o)
+SHARED_OBJS = $(SHARED_SRCS:.cpp=.o)
 
 # Default target runs when you just type 'make'
 all: $(TARGET_TRAIN) $(TARGET_PREDICT)
@@ -44,7 +44,7 @@ run_inference: $(TARGET_PREDICT)
 # Clean up binaries
 clean:
 	@echo "Cleaning build files..."
-	rm -f $(SHARED_OBJS) $(TARGET_PREDICT) $(TARGET_TRAIN)
+	rm -f $(SHARED_OBJS) src/*.o $(TARGET_PREDICT) $(TARGET_TRAIN)
 
 # Phony targets prevent conflicts
 .PHONY: all clean run_train run_inference
