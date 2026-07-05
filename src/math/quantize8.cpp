@@ -36,8 +36,11 @@ std::vector<QWeight32> quantize_weights(std::vector<Matrix> &weights) {
       blks.push_back(blk);
     }
 
-    if (num_left == 0)
+    if (num_left == 0) {
+      wt_blk.qblocks = blks;
+      q_weights.push_back(wt_blk);
       continue;
+    }
 
     QBlock32 blk;
     double max = 0.0;
@@ -60,7 +63,6 @@ std::vector<QWeight32> quantize_weights(std::vector<Matrix> &weights) {
     blks.push_back(blk);
 
     wt_blk.qblocks = blks;
-
     q_weights.push_back(wt_blk);
   }
 

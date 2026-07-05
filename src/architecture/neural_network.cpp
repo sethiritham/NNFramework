@@ -1,6 +1,7 @@
 #include "neural_network.hpp"
 #include "activation_functions.hpp"
 #include "matrix.hpp"
+#include "quantize8.hpp"
 #include <cstddef>
 #include <cstdint>
 #include <fstream>
@@ -391,4 +392,60 @@ void NeuralNetwork::load_model_bin(const char *filepath) {
   }
 
   LOG("MODEL LOADED!");
+}
+
+void NeuralNetwork::save_model_int8(const char *filepath) {
+  std::vector<QWeight32> q_wts;
+  q_wts = quantize_weights(this->weights_);
+
+  std::ofstream saved_state(filepath, std::ios::binary);
+
+  if (!saved_state) {
+    LOG("COULD NOT OPEN FILE!");
+    return;
+  }
+
+  size_t num_weights_bias = weights_.size();
+
+  saved_state.write(reinterpret_cast<const char *>(&num_weights_bias),
+                    sizeof(num_weights_bias));
+
+  for (size_t i = 0; i < num_weights_bias; i++) {
+    uint32_t rows = weights_[i].num_rows;
+    uint32_t cols = weights_[i].num_cols;
+
+    saved_state.write(reinterpret_cast<const char *>(&rows), sizeof(rows));
+
+    saved_state.write(reinterpret_cast<const char *>(&cols), sizeof(cols));
+
+    size_t num_blks = q_wts[i].qblocks.size();
+
+    saved_state.write(reinterpret_cast<const char *>(&num_blks),
+                      sizeof(num_blks));
+
+    for (size_t j = 0; j < q_wts[i].qblocks.size(); j++) {
+      float scale = q_wts[i].qblocks[j].scale;
+
+      saved_state.write(reinterpret_cast<const char *>(&scale), sizeof(float));
+
+      saved_state.write(
+          reinterpret_cast<const char *>(q_wts[i].qblocks[j].weights),
+          sizeof(q_wts[i].qblocks[j].weights));
+    }
+
+    rows = biases_[i].num_rows;
+    cols = biases_[i].num_cols;
+
+    saved_state.write(reinterpret_cast<const char *>(&rows), sizeof(rows));
+    saved_state.write(reinterpret_cast<const char *>(&cols), sizeof(cols));
+
+    for (uint32_t row = 0; row < rows; row++) {
+      for (uint32_t col = 0; col < cols; col++) {
+        double val = biases_[i][row][col];
+        saved_state.write(reinterpret_cast<const char *>(&val), sizeof(val));
+      }
+    }
+  }
+
+  LOG("MODEL SAVED!");
 }

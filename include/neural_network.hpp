@@ -1,5 +1,6 @@
 #pragma once
 #include "matrix.hpp"
+#include "quantize8.hpp"
 #include <cmath>
 #include <vector>
 
@@ -115,4 +116,8 @@ public:
    * @brief loads the model file (binary)
    */
   void load_model_bin(const char *filepath);
+
+  void save_model_int8(const char *filepath);
+
+  void load_model_int8(const char *filepath);
 };
