@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <iostream>
 #include <stdexcept>
 #include <vector>
@@ -65,6 +66,8 @@ public:
    * @brief Shows the dimensions of the matrix object
    */
   void show_dimensions();
+
+  std::vector<double> get_data();
 
   /**
    * @param data pointer freed

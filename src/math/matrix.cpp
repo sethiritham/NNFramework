@@ -5,6 +5,7 @@
 #include <map>
 #include <random>
 #include <string>
+#include <vector>
 
 // MATRIX FUNCTIONS
 Matrix::Matrix() : num_rows(0), num_cols(0), data(nullptr) {}
@@ -226,4 +227,17 @@ void Matrix::show_dimensions() {
   for (const auto &[key, value] : dimensions) {
     std::cout << key << " => " << value << std::endl;
   }
+}
+
+std::vector<double> Matrix::get_data() {
+  std::vector<double> matrix_data;
+  matrix_data.reserve(this->num_elements());
+
+  for (size_t i = 0; i < this->num_rows; i++) {
+    for (size_t j = 0; j < this->num_cols; j++) {
+      matrix_data[i + j] = (*this)[i][j];
+    }
+  }
+
+  return matrix_data;
 }
