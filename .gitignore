@@ -1,5 +1,6 @@
 build/
 data/
+gemini/
 .clocignore 
 neural_network_roadmap.md
 .vscode/

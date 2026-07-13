@@ -235,7 +235,7 @@ std::vector<double> Matrix::get_data() {
 
   for (size_t i = 0; i < this->num_rows; i++) {
     for (size_t j = 0; j < this->num_cols; j++) {
-      matrix_data[i + j] = (*this)[i][j];
+      matrix_data.push_back((*this)[i][j]);
     }
   }
 

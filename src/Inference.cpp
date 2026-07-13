@@ -1,4 +1,5 @@
 #include "neural_network.hpp"
+#include <cmath>
 #include <fstream>
 #include <sstream>
 
@@ -50,8 +51,8 @@ int main() {
 
   LOG("Started loading model!");
 
-  nn.load_model_bin("/Users/rizzam/Codes/C++/"
-                    "NNFramework/model.bin");
+  nn.load_model_int8("/Users/rizzam/Codes/C++/"
+                     "NNFramework/model.bin");
 
   double acc = 0.0;
 
@@ -67,7 +68,7 @@ int main() {
 
   for (int sample = 0; sample < num_samples; sample++) {
 
-    double max_prob = 0.0;
+    double max_prob = -INFINITY;
 
     int pred_num = 0;
 

@@ -68,7 +68,7 @@ int main() {
   actual_prediction_matrix.display_matrix();
 
   double total_time = 0.0;
-  int loop_cycles = 20000;
+  int loop_cycles = 10000;
   for (int k = 0; k < loop_cycles; k++) {
     double loss = 0.0;
 

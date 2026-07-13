@@ -497,13 +497,16 @@ void NeuralNetwork::load_model_int8(const char *filepath) {
 
     QWeight32 qwt;
 
-    qwt.rows = 0;
-    qwt.cols = 0;
+    uint32_t rows = 0;
+    uint32_t cols = 0;
 
-    saved_state.read(reinterpret_cast<char *>(&qwt.rows), sizeof(qwt.rows));
-    saved_state.read(reinterpret_cast<char *>(&qwt.cols), sizeof(qwt.cols));
+    saved_state.read(reinterpret_cast<char *>(&rows), sizeof(rows));
+    saved_state.read(reinterpret_cast<char *>(&cols), sizeof(cols));
 
-    int num_blks = 0;
+    qwt.cols = cols;
+    qwt.rows = rows;
+
+    size_t num_blks = 0;
 
     saved_state.read(reinterpret_cast<char *>(&num_blks), sizeof(num_blks));
 
@@ -511,7 +514,7 @@ void NeuralNetwork::load_model_int8(const char *filepath) {
 
     LOG("num blks: " << num_blks);
 
-    for (int j = 0; j < num_blks; j++) {
+    for (size_t j = 0; j < num_blks; j++) {
 
       QBlock32 blk;
 
@@ -526,13 +529,11 @@ void NeuralNetwork::load_model_int8(const char *filepath) {
 
     LOG("weights pushed back!");
 
-    uint32_t rows = 0;
-    uint32_t cols = 0;
+    rows = 0;
+    cols = 0;
 
     saved_state.read(reinterpret_cast<char *>(&rows), sizeof(rows));
     saved_state.read(reinterpret_cast<char *>(&cols), sizeof(cols));
-
-    LOG("rows: " << rows << " cols: " << cols);
 
     for (uint32_t row = 0; row < rows; row++) {
       for (uint32_t col = 0; col < cols; col++) {
