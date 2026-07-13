@@ -1,6 +1,5 @@
 #pragma once
 #include "matrix.hpp"
-#include <cmath>
 #include <cstdint>
 #include <vector>
 
@@ -16,3 +15,7 @@ struct QWeight32 {
 };
 
 std::vector<QWeight32> quantize_weights(std::vector<Matrix> &weights);
+
+Matrix dequantize_weight(QWeight32 q_weight);
+
+Matrix multiply_quantized(QWeight32 &weights, Matrix &inputs);

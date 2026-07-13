@@ -42,14 +42,16 @@ int main() {
   Matrix input_matrix(num_samples, 784);
   Matrix true_matrix(num_samples, 10);
 
-  load_mnist_csv("/mnt/5b2b3cbe-5bcb-4a72-a855-bc9cc94ccf4f/RITHAM/CODES/C++/"
+  load_mnist_csv("/Users/rizzam/Codes/C++/"
                  "NNFramework/data/mnist_test.csv",
                  input_matrix, true_matrix, 20);
 
   NeuralNetwork nn(784, 10, {256, 128}, num_samples, 1e-4);
 
-  nn.load_model_bin("/mnt/5b2b3cbe-5bcb-4a72-a855-bc9cc94ccf4f/RITHAM/CODES/"
-                    "C++/NNFramework/model.bin");
+  LOG("Started loading model!");
+
+  nn.load_model_bin("/Users/rizzam/Codes/C++/"
+                    "NNFramework/model.bin");
 
   double acc = 0.0;
 
@@ -57,7 +59,11 @@ int main() {
 
   output_pred.fill_matrix_double(0.0, output_pred);
 
-  output_pred = nn.forward_pass(input_matrix);
+  LOG("Forward pass started");
+
+  output_pred = nn.forward_pass_int8(input_matrix);
+
+  LOG("Forward pass finished!");
 
   for (int sample = 0; sample < num_samples; sample++) {
 

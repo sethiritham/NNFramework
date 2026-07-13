@@ -1,5 +1,5 @@
 # Compiler settings
-CXX = g++
+CXX = clang++
 
 # CXXFLAGS Explained:
 # -Iinclude     : Tells the compiler to look in the include/ directory for .hpp files

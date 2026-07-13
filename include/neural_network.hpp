@@ -16,6 +16,8 @@ public:
   std::vector<Matrix> biases_;
   std::vector<Matrix> weights_;
 
+  std::vector<QWeight32> qweights_;
+
   const double learning_rate;
   Matrix actual_prediction;
 
@@ -81,6 +83,12 @@ public:
    * @brief executes the forward pass and returns the prediction
    */
   Matrix forward_pass(Matrix &inputs);
+
+  /**
+   * @brief dequantizes the weights(int8), executes the forward pass and returns
+   * the prediction
+   */
+  Matrix forward_pass_int8(Matrix &inputs);
 
   /**
    * @brief ReLU loss function

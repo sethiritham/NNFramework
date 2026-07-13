@@ -62,14 +62,14 @@ int main() {
   actual_prediction_matrix.fill_matrix_double(0, actual_prediction_matrix);
   input_matrix.fill_matrix_double(0, input_matrix);
 
-  load_mnist_csv("/mnt/5b2b3cbe-5bcb-4a72-a855-bc9cc94ccf4f/RITHAM/CODES/C++/"
-                 "NNFramework/data/mnist_train.csv",
+  load_mnist_csv("/Users/rizzam/Codes/C++/NNFramework/data/mnist_train.csv",
                  input_matrix, actual_prediction_matrix, num_samples);
 
   actual_prediction_matrix.display_matrix();
 
   double total_time = 0.0;
-  for (int k = 0; k < 1000; k++) {
+  int loop_cycles = 20000;
+  for (int k = 0; k < loop_cycles; k++) {
     double loss = 0.0;
 
     Matrix pred(num_samples, 10);
@@ -88,9 +88,9 @@ int main() {
     LOG("LOSS IS: " << std::endl << loss);
   }
 
-  LOG("AVERAGE TIME DURATION AFTER CACHE TILING: " << total_time / 20000.0
+  LOG("AVERAGE TIME DURATION AFTER CACHE TILING: " << total_time / loop_cycles
                                                    << "ms");
 
-  nn.save_model_int8("/mnt/5b2b3cbe-5bcb-4a72-a855-bc9cc94ccf4f/RITHAM/CODES/"
+  nn.save_model_int8("/Users/rizzam/Codes/"
                      "C++/NNFramework/model.bin");
 }

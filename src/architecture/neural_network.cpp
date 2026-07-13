@@ -9,6 +9,7 @@
 #include <limits>
 #include <ostream>
 #include <random>
+#include <vector>
 
 // PUBLIC FUNCTIONS
 NeuralNetwork::NeuralNetwork(std::size_t input, std::size_t output,
@@ -19,6 +20,7 @@ NeuralNetwork::NeuralNetwork(std::size_t input, std::size_t output,
   std::cout << "Started initializer" << std::endl;
 
   weights_.reserve(num_hidden_layers_ + 1);
+  qweights_.reserve(num_hidden_layers_ + 1);
   biases_.reserve(num_hidden_layers_ + 1);
   input_cache_.reserve(num_hidden_layers_ + 1);
 
@@ -52,6 +54,7 @@ NeuralNetwork::NeuralNetwork(std::size_t input, std::size_t output,
   std::cout << "Started initializer" << std::endl;
 
   weights_.reserve(num_hidden_layers_ + 1);
+  qweights_.reserve(num_hidden_layers_ + 1);
   biases_.reserve(num_hidden_layers_ + 1);
   input_cache_.reserve(num_hidden_layers_ + 1);
 
@@ -93,6 +96,36 @@ Matrix NeuralNetwork::forward_pass(Matrix &inputs) {
 
   prev_pred = Matrix::row_wise_sum(prev_pred * weights_[num_hidden_layers_],
                                    biases_[num_hidden_layers_]);
+
+  update_using_softmax(prev_pred);
+  input_cache_.emplace_back(prev_pred);
+
+  return prev_pred;
+}
+
+Matrix NeuralNetwork::forward_pass_int8(Matrix &inputs) {
+  LOG("STARTING FORWARD PASS\n");
+  input_cache_
+      .clear(); // cleaing the input cache at the start of the forward pass
+
+  input_cache_.emplace_back(inputs);
+
+  Matrix prev_pred = input_cache_[0];
+
+  for (std::size_t i = 0; i < num_hidden_layers_; i++) {
+    Matrix input_weight = multiply_quantized(qweights_[i], prev_pred);
+
+    prev_pred = Matrix::row_wise_sum(input_weight, biases_[i]);
+
+    update_using_ReLU(prev_pred);
+
+    input_cache_.emplace_back(prev_pred);
+  }
+
+  Matrix input_weight =
+      multiply_quantized(qweights_[num_hidden_layers_], prev_pred);
+
+  prev_pred = Matrix::row_wise_sum(input_weight, biases_[num_hidden_layers_]);
 
   update_using_softmax(prev_pred);
   input_cache_.emplace_back(prev_pred);
@@ -448,4 +481,68 @@ void NeuralNetwork::save_model_int8(const char *filepath) {
   }
 
   LOG("MODEL SAVED!");
+}
+
+void NeuralNetwork::load_model_int8(const char *filepath) {
+  std::vector<QWeight32> q_wts;
+
+  std::ifstream saved_state(filepath, std::ios::binary);
+
+  size_t num_wts = 0;
+  saved_state.read(reinterpret_cast<char *>(&num_wts), sizeof(size_t));
+
+  LOG("NUM wts: " << num_wts);
+
+  for (size_t i = 0; i < num_wts; i++) {
+
+    QWeight32 qwt;
+
+    qwt.rows = 0;
+    qwt.cols = 0;
+
+    saved_state.read(reinterpret_cast<char *>(&qwt.rows), sizeof(qwt.rows));
+    saved_state.read(reinterpret_cast<char *>(&qwt.cols), sizeof(qwt.cols));
+
+    int num_blks = 0;
+
+    saved_state.read(reinterpret_cast<char *>(&num_blks), sizeof(num_blks));
+
+    qwt.qblocks.reserve(num_blks);
+
+    LOG("num blks: " << num_blks);
+
+    for (int j = 0; j < num_blks; j++) {
+
+      QBlock32 blk;
+
+      saved_state.read(reinterpret_cast<char *>(&blk.scale), sizeof(float));
+
+      saved_state.read(reinterpret_cast<char *>(blk.weights),
+                       sizeof(blk.weights));
+
+      qwt.qblocks.push_back(blk);
+    }
+    q_wts.push_back(qwt);
+
+    LOG("weights pushed back!");
+
+    uint32_t rows = 0;
+    uint32_t cols = 0;
+
+    saved_state.read(reinterpret_cast<char *>(&rows), sizeof(rows));
+    saved_state.read(reinterpret_cast<char *>(&cols), sizeof(cols));
+
+    LOG("rows: " << rows << " cols: " << cols);
+
+    for (uint32_t row = 0; row < rows; row++) {
+      for (uint32_t col = 0; col < cols; col++) {
+        saved_state.read(reinterpret_cast<char *>(&biases_[i][row][col]),
+                         sizeof(biases_[i][row][col]));
+      }
+    }
+  }
+
+  qweights_ = q_wts;
+
+  LOG("MODEL LOADED!");
 }
