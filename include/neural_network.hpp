@@ -90,6 +90,8 @@ public:
    */
   Matrix forward_pass_int8(Matrix &inputs);
 
+  Matrix forward_pass_int8_multithreaded(Matrix &inputs);
+
   /**
    * @brief ReLU loss function
    */

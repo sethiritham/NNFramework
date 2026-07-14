@@ -1,6 +1,7 @@
 #include "quantize8.hpp"
 #include <cmath>
 #include <cstdint>
+#include <thread>
 #include <vector>
 
 std::vector<QWeight32> quantize_weights(std::vector<Matrix> &weights) {
@@ -135,6 +136,55 @@ Matrix multiply_quantized(QWeight32 &weights, Matrix &inputs) {
         output[i][j] += (double)qwt * (double)scale * input_val;
       }
     }
+  }
+
+  return output;
+}
+
+void muliply_quantized_chunked(QWeight32 &weights, Matrix &inputs,
+                               Matrix &output, uint32_t start_row,
+                               uint32_t end_row) {
+
+  for (uint32_t i = start_row; i < end_row; i++) {
+    for (uint32_t k = 0; k < inputs.num_cols; k++) {
+      if (inputs[i][k] == 0.0)
+        continue;
+      double input_val = inputs[i][k];
+
+      for (uint32_t j = 0; j < weights.cols; j++) {
+        int block_index = (k * weights.cols + j) / 32;
+        int val_index = (k * weights.cols + j) % 32;
+
+        int8_t qwt = weights.qblocks[block_index].weights[val_index];
+        float scale = weights.qblocks[block_index].scale;
+
+        output[i][j] += (double)qwt * (double)scale * input_val;
+      }
+    }
+  }
+}
+
+Matrix multiply_quantized_multithreaded(QWeight32 &weights, Matrix &inputs) {
+  Matrix output(inputs.num_rows, weights.cols);
+
+  std::vector<std::thread> workers;
+
+  uint32_t num_threads = std::thread::hardware_concurrency();
+
+  uint32_t num_rows_per_thread = inputs.num_rows / num_threads;
+
+  for (uint32_t i = 0; i < num_threads; i++) {
+    uint32_t start_row = i * num_rows_per_thread;
+    uint32_t end_row = (i == num_threads - 1) ? inputs.num_rows
+                                              : start_row + num_rows_per_thread;
+
+    workers.emplace_back(muliply_quantized_chunked, std::ref(weights),
+                         std::ref(inputs), std::ref(output), start_row,
+                         end_row);
+  }
+
+  for (auto &worker : workers) {
+    worker.join();
   }
 
   return output;

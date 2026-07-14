@@ -1,3 +1,4 @@
+#include "ScopeTimer.hpp"
 #include "neural_network.hpp"
 #include <cmath>
 #include <fstream>
@@ -39,7 +40,7 @@ void load_mnist_csv(const std::string &filename, Matrix &X, Matrix &Y,
 }
 
 int main() {
-  int num_samples = 20;
+  int num_samples = 10000;
   Matrix input_matrix(num_samples, 784);
   Matrix true_matrix(num_samples, 10);
 
@@ -60,9 +61,11 @@ int main() {
 
   output_pred.fill_matrix_double(0.0, output_pred);
 
-  LOG("Forward pass started");
+  LOG("Forward pass single-threaded!");
 
+  ScopeTimer timer("Forward pass");
   output_pred = nn.forward_pass_int8(input_matrix);
+  timer.time_display();
 
   LOG("Forward pass finished!");
 

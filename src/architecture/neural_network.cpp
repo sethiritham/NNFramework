@@ -133,6 +133,36 @@ Matrix NeuralNetwork::forward_pass_int8(Matrix &inputs) {
   return prev_pred;
 }
 
+Matrix NeuralNetwork::forward_pass_int8_multithreaded(Matrix &inputs) {
+  LOG("STARTING FORWARD PASS\n");
+  input_cache_
+      .clear(); // cleaing the input cache at the start of the forward pass
+
+  input_cache_.emplace_back(inputs);
+
+  Matrix prev_pred = input_cache_[0];
+
+  for (std::size_t i = 0; i < num_hidden_layers_; i++) {
+    Matrix input_weight = multiply_quantized(qweights_[i], prev_pred);
+
+    prev_pred = Matrix::row_wise_sum(input_weight, biases_[i]);
+
+    update_using_ReLU(prev_pred);
+
+    input_cache_.emplace_back(prev_pred);
+  }
+
+  Matrix input_weight =
+      multiply_quantized(qweights_[num_hidden_layers_], prev_pred);
+
+  prev_pred = Matrix::row_wise_sum(input_weight, biases_[num_hidden_layers_]);
+
+  update_using_softmax(prev_pred);
+  input_cache_.emplace_back(prev_pred);
+
+  return prev_pred;
+}
+
 double NeuralNetwork::loss_fn(const Matrix &pred, const Matrix &actual) {
   actual_prediction = actual;
 

@@ -5,6 +5,7 @@
 #include <map>
 #include <random>
 #include <string>
+#include <thread>
 #include <vector>
 
 // MATRIX FUNCTIONS

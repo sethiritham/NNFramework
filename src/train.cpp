@@ -1,9 +1,10 @@
 #include "ScopeTimer.hpp"
-#include "neural_network.hpp"
+#include "neural_network.hpp"'
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <thread>
 #include <vector>
 
 /**
