@@ -53,7 +53,7 @@ void load_mnist_csv(const std::string &filename, Matrix &X, Matrix &Y,
 }
 
 int main() {
-  int num_samples = 128;
+  int num_samples = 1000;
 
   NeuralNetwork nn(784, 10, {256, 128}, num_samples, 1e-4);
 
@@ -69,7 +69,7 @@ int main() {
   actual_prediction_matrix.display_matrix();
 
   double total_time = 0.0;
-  int loop_cycles = 10000;
+  int loop_cycles = 100;
   for (int k = 0; k < loop_cycles; k++) {
     double loss = 0.0;
 
@@ -89,8 +89,8 @@ int main() {
     LOG("LOSS IS: " << std::endl << loss);
   }
 
-  LOG("AVERAGE TIME DURATION AFTER CACHE TILING: " << total_time / loop_cycles
-                                                   << "ms");
+  LOG("AVERAGE TIME AFTER MULTITHREADING MULTIPLICATION: "
+      << total_time / loop_cycles << "ms");
 
   nn.save_model_int8("/Users/rizzam/Codes/"
                      "C++/NNFramework/model.bin");

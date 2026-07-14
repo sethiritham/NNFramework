@@ -1,7 +1,10 @@
 #pragma once
 #include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <stdexcept>
+#include <sys/types.h>
+#include <thread>
 #include <vector>
 #define LOG(x) std::cout << x << std::endl
 
@@ -13,6 +16,20 @@ public:
 
 private:
   double *data;
+
+private:
+  static void multiply_chunked(const Matrix &A, const Matrix &B, Matrix &output,
+                               uint32_t start_row, uint32_t end_row) {
+
+    for (size_t row = start_row; row < end_row; row++) {
+      for (size_t col = 0; col < A.num_cols; col++) {
+        double scalar = A[row][col];
+        for (size_t k = 0; k < B.num_cols; k++) {
+          output[row][k] += scalar * B[col][k];
+        }
+      }
+    }
+  }
 
   // Class fucntions
 public:
@@ -137,6 +154,36 @@ public:
     }
 
     return result;
+  }
+
+  static Matrix multiply_multithreaded(Matrix &A, Matrix &B) {
+    if (A.num_cols != B.num_rows) {
+      LOG("Function: multiply_multithreaded\nIssue: Dimensions dont match");
+      return {};
+    }
+
+    Matrix op(A.num_rows, B.num_cols);
+    op.fill_matrix_double(0.0, op);
+
+    uint32_t num_threads = std::thread::hardware_concurrency();
+    uint32_t num_rows_per_thread = A.num_rows / num_threads;
+
+    std::vector<std::thread> threads;
+
+    for (uint32_t i = 0; i < num_threads; i++) {
+      uint32_t start_row = i * num_rows_per_thread;
+      uint32_t end_row =
+          (i == num_threads - 1) ? A.num_rows : (i + 1) * num_rows_per_thread;
+
+      threads.emplace_back(multiply_chunked, std::ref(A), std::ref(B),
+                           std::ref(op), start_row, end_row);
+    }
+
+    for (auto &thread : threads) {
+      thread.join();
+    }
+
+    return op;
   }
 
   // Matrix operators

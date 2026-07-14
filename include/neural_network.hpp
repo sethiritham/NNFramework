@@ -84,6 +84,8 @@ public:
    */
   Matrix forward_pass(Matrix &inputs);
 
+  Matrix forward_pass_multithreaded(Matrix &inputs);
+
   /**
    * @brief dequantizes the weights(int8), executes the forward pass and returns
    * the prediction

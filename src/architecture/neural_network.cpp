@@ -87,15 +87,17 @@ Matrix NeuralNetwork::forward_pass(Matrix &inputs) {
   Matrix prev_pred = input_cache_[0];
 
   for (std::size_t i = 0; i < num_hidden_layers_; i++) {
-    prev_pred = Matrix::row_wise_sum(prev_pred * weights_[i], biases_[i]);
+    prev_pred = Matrix::row_wise_sum(
+        Matrix::multiply_multithreaded(prev_pred, weights_[i]), biases_[i]);
 
     update_using_ReLU(prev_pred);
 
     input_cache_.emplace_back(prev_pred);
   }
 
-  prev_pred = Matrix::row_wise_sum(prev_pred * weights_[num_hidden_layers_],
-                                   biases_[num_hidden_layers_]);
+  prev_pred = Matrix::row_wise_sum(
+      Matrix::multiply_multithreaded(prev_pred, weights_[num_hidden_layers_]),
+      biases_[num_hidden_layers_]);
 
   update_using_softmax(prev_pred);
   input_cache_.emplace_back(prev_pred);
@@ -260,7 +262,8 @@ void NeuralNetwork::backward_pass() {
 
     grad_output = input_cache_[i - 1];
 
-    d_weight = ~grad_output * filtered_gradient;
+    Matrix t_grad_output = ~grad_output;
+    d_weight = Matrix::multiply_multithreaded(t_grad_output, filtered_gradient);
 
     for (size_t cols = 0; cols < filtered_gradient.num_cols; cols++) {
       double sum = 0;
@@ -271,7 +274,9 @@ void NeuralNetwork::backward_pass() {
       d_bias[0][cols] = sum;
     }
 
-    grad_output = filtered_gradient * (~weights_[i - 1]);
+    Matrix t_weight = ~weights_[i - 1];
+
+    grad_output = Matrix::multiply_multithreaded(filtered_gradient, t_weight);
 
     filtered_gradient =
         calculate_and_filter_gradient_ReLU(grad_output, input_cache_[i - 1]);
