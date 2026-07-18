@@ -15,6 +15,7 @@ MemoryAllocator::MemoryAllocator() {
 
   for (int i = 0; i < 512; i++) {
     sections[511 - i] = (i * 2 * MB + memoryPointer);
+    ptrs_per_section[i] = 0;
   }
 }
 
@@ -99,10 +100,39 @@ char *MemoryAllocator::allocate(std::size_t size) {
 
     current->next = nullptr;
 
+    uint8_t blk_index = (ptr - memoryPointer) / (2 * MB);
+
+    ptrs_per_section[blk_index]++;
+
     return ptr;
   } else {
     char *ptr = (char *)(free_lists[index]);
     free_lists[index] = free_lists[index]->next;
+
+    uint8_t blk_index = (ptr - memoryPointer) / (2 * MB);
+    ptrs_per_section[blk_index]++;
+
     return ptr;
   }
+}
+
+void MemoryAllocator::deallocate(char *ptr, size_t size) {
+
+  size = (size < 128) ? 128 : size;
+
+  if (size > 2 * MB) {
+    std::free((void *)ptr);
+  }
+
+  uint8_t index = get_index(size);
+
+  Node *freed_block = (Node *)ptr;
+
+  freed_block->next = free_lists[index];
+
+  free_lists[index] = freed_block;
+
+  uint8_t blk_index = (ptr - memoryPointer) / (2 * MB);
+
+  ptrs_per_section[blk_index]--;
 }
