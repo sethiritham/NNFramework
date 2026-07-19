@@ -9,13 +9,12 @@ MemoryAllocator::MemoryAllocator() {
   memoryPointer =
       reinterpret_cast<char *>(std::aligned_alloc(128, 1024 * 1024 * 1024));
 
-  for (auto &free_list : free_lists) {
-    free_list = nullptr;
+  for (auto &slab_index : head_slab_indices) {
+    slab_index = -1;
   }
 
   for (int i = 0; i < 512; i++) {
-    sections[511 - i] = (i * 2 * MB + memoryPointer);
-    ptrs_per_section[i] = 0;
+    free_slab_indices[511 - i] = 511 - i;
   }
 }
 
@@ -73,13 +72,17 @@ char *MemoryAllocator::allocate(std::size_t size) {
 
   uint8_t index = get_index(size);
 
-  if (free_lists[index] == nullptr) {
+  if (head_slab_indices[index] == -1) {
 
     if (top_index < 0) {
       return reinterpret_cast<char *>(std::aligned_alloc(128, size));
     }
 
-    char *ptr = sections[top_index];
+    int slab_index = free_slab_indices[top_index];
+    Slab &current_slab = slabs[slab_index];
+    head_slab_indices[index] = slab_index;
+
+    char *ptr = (char *)(memoryPointer + 2 * MB * slab_index);
     top_index--;
 
     if (index == 14)
@@ -89,9 +92,8 @@ char *MemoryAllocator::allocate(std::size_t size) {
       return reinterpret_cast<char *>(std::aligned_alloc(128, size));
 
     int stride = 128 << index;
-
     Node *current = (Node *)(ptr + stride);
-    free_lists[index] = (Node *)(ptr + stride);
+    current_slab.free_list_head = (Node *)(ptr + stride);
 
     for (int i = 2 * stride; i < 2 * MB; i += stride) {
       current->next = (Node *)((char *)current + stride);
@@ -100,19 +102,52 @@ char *MemoryAllocator::allocate(std::size_t size) {
 
     current->next = nullptr;
 
-    uint8_t blk_index = (ptr - memoryPointer) / (2 * MB);
-
-    ptrs_per_section[blk_index]++;
+    current_slab.num_allocs++;
 
     return ptr;
   } else {
-    char *ptr = (char *)(free_lists[index]);
-    free_lists[index] = free_lists[index]->next;
 
-    uint8_t blk_index = (ptr - memoryPointer) / (2 * MB);
-    ptrs_per_section[blk_index]++;
+    int slab_index = head_slab_indices[index];
+    Slab &current_slab = slabs[slab_index];
 
-    return ptr;
+    if (slabs[slab_index].free_list_head == nullptr &&
+        slabs[slab_index].next_block == -1) {
+
+      int next_slab_index = free_slab_indices[top_index];
+
+      slabs[slab_index] = slabs[next_slab_index];
+      slabs[slab_index].next_block = next_slab_index;
+
+      head_slab_indices[index] = next_slab_index;
+
+      return allocate(size);
+    }
+
+    else if (current_slab.free_list_head == nullptr &&
+             current_slab.next_block != -1) {
+      slab_index = current_slab.next_block;
+      current_slab = slabs[slab_index];
+
+      head_slab_indices[index] = slab_index;
+
+      return allocate(size);
+    }
+
+    else {
+      char *ptr = (char *)(current_slab.free_list_head);
+
+      if (index == 14) {
+        current_slab.free_list_head = nullptr;
+        return ptr;
+      }
+      if (!ptr)
+        return reinterpret_cast<char *>(std::aligned_alloc(128, size));
+
+      current_slab.free_list_head = current_slab.free_list_head->next;
+      current_slab.num_allocs++;
+
+      return ptr;
+    }
   }
 }
 
@@ -125,14 +160,5 @@ void MemoryAllocator::deallocate(char *ptr, size_t size) {
   }
 
   uint8_t index = get_index(size);
-
   Node *freed_block = (Node *)ptr;
-
-  freed_block->next = free_lists[index];
-
-  free_lists[index] = freed_block;
-
-  uint8_t blk_index = (ptr - memoryPointer) / (2 * MB);
-
-  ptrs_per_section[blk_index]--;
 }
