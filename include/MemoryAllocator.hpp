@@ -26,7 +26,7 @@ public:
 
   char *allocate(std::size_t size);
 
-  void deallocate(char *ptr, size_t size);
+  template <typename T> void deallocate(T *ptr, size_t size);
 
   ~MemoryAllocator();
 };

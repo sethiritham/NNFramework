@@ -151,14 +151,37 @@ char *MemoryAllocator::allocate(std::size_t size) {
   }
 }
 
-void MemoryAllocator::deallocate(char *ptr, size_t size) {
+template <typename T> void MemoryAllocator::deallocate(T *ptr, size_t size) {
 
   size = (size < 128) ? 128 : size;
 
   if (size > 2 * MB) {
     std::free((void *)ptr);
+    return;
   }
 
   uint8_t index = get_index(size);
   Node *freed_block = (Node *)ptr;
+
+  uint16_t slab_index = ((char *)ptr - memoryPointer) / (2 * MB);
+
+  Slab &current_slab = slabs[slab_index];
+
+  Node *next_free_node = current_slab.free_list_head;
+  current_slab.free_list_head = freed_block;
+  current_slab.free_list_head->next = next_free_node;
+
+  current_slab.num_allocs--;
+
+  if (current_slab.num_allocs == 0) {
+    top_index++;
+    free_slab_indices[top_index] = slab_index;
+
+    if (head_slab_indices[index] == slab_index) {
+      head_slab_indices[index] = current_slab.next_block;
+    }
+
+    current_slab.free_list_head = nullptr;
+    current_slab.next_block = -1;
+  }
 }
