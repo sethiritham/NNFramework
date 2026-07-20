@@ -11,7 +11,7 @@ private:
 public:
   TensorStorage(size_t size);
 
-  TensorStorage(TensorStorage &T);
+  TensorStorage(const TensorStorage &other);
 
   TensorStorage &operator=(const TensorStorage &other);
 
