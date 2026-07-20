@@ -185,3 +185,5 @@ template <typename T> void MemoryAllocator::deallocate(T *ptr, size_t size) {
     current_slab.next_block = -1;
   }
 }
+
+MemoryAllocator::~MemoryAllocator() { std::free(memoryPointer); }
